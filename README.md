@@ -3,31 +3,12 @@
 ![SDG 2](https://img.shields.io/badge/SDG-2%20Zero%20Hunger-green)
 ![Competition](https://img.shields.io/badge/MLSC%20Cyan%202026-EDM%20Laboratory-blue)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
-![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 **Machine Learning Solution Challenge (MLSC) – Cyan Academic Competition 2026**  
 **Organizer:** Enterprise Data Management (EDM) Laboratory  
-**Cabang:** Machine Learning Solution Challenge (EDM Lab)  
-**Target SDG:** **SDG 2 — Zero Hunger** (stabilitas pasokan & keterjangkauan harga pangan pokok di Asia Tenggara)
+**Target SDG:** **SDG 2 — Zero Hunger**
 
-### Identitas Tim
-| Peran | Nama | Institusi / Kontak |
-|-------|------|--------------------|
-| **Tim** | **PenaklukFCMobile** | Universitas Bina Nusantara |
-| **Ketua** | Nicholas Driyadis Tjoe | 089602767594 |
-| **Anggota** | Christian Caesar | Universitas Bina Nusantara |
-| **Anggota** | Gerald Amadeo Passover Sutanto | Universitas Bina Nusantara |
-
----
-
-## Executive Summary & Problem Statement
-
-Stabilitas harga pangan pokok (beras, daging, minyak goreng) merupakan fondasi ketahanan pangan rumah tangga di ASEAN. Fluktuasi harga yang tajam mengurangi daya beli, meningkatkan risiko gizi buruk, dan dapat memicu instabilitas sosial. Data WFP/HDX 2015–2025 menunjukkan heterogenitas harga yang tinggi antar negara dan antar jenis pasar (Retail vs Wholesale).
-
-**FoodShock** menjawab tantangan tersebut dengan:
-1. Sistem *forecasting* panel lintas negara yang akurat untuk horizon t+1.
-2. Deteksi dini *Food Price Shock* berbasis residual forecasting + skor klasifikasi.
-3. Interpretabilitas (SHAP) yang mendukung rekomendasi kebijakan konkret bagi AFSIS dan kementerian nasional.
+FoodShock forecasts monthly food prices across ASEAN markets and issues early warnings for potential price shocks, supporting price stability monitoring and policy readiness under SDG 2.
 
 ---
 
@@ -35,115 +16,65 @@ Stabilitas harga pangan pokok (beras, daging, minyak goreng) merupakan fondasi k
 
 ```
 .
-├── README.md                              # This file
-├── requirements.txt                       # Python dependencies
-├── .gitignore                             # Standard Python/DS ignore rules
-├── FoodShock_MLSC2026_Solution.ipynb      # Main solution notebook (narrative + code + outputs)
-├── foodshock_pipeline.py                  # Full end-to-end pipeline (audit → features → models)
-├── run_residual_modeling.py               # Focused residual-forecasting modeling script
-├── asean_wfp_2015_2025.csv                # Raw WFP/HDX ASEAN food price data (2015–2025)
-├── foodshock_asean_model_ready.csv        # Clean, feature-engineered panel (model-ready)
-├── fpma_wfp_country_coverage.csv          # Audit: country-level coverage (≥60 months)
-├── fpma_wfp_commodity_coverage.csv        # Audit: commodity-group coverage
-├── model_evaluation_results.csv           # Overall model comparison (MAE, RMSE, sMAPE, R²)
-├── model_eval_by_commodity.csv            # Stratified metrics by commodity group
-├── model_eval_by_country.csv              # Stratified metrics by country
-├── model_eval_by_pricetype.csv            # Stratified metrics Retail vs Wholesale
-├── model_eval_shock_classification.csv    # Precision / Recall / F1 / ROC-AUC for shock detection
-└── figures/
-    ├── eda_trends.png
-    ├── model_comparison.png
-    ├── actual_vs_predicted.png
-    ├── shap_summary.png
-    ├── error_by_commodity.png
-    └── shock_residual_dist.png
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── notebooks/
+│   └── FoodShock_MLSC2026_Solution.ipynb   # Full solution notebook (tables & figures embedded)
+├── src/
+│   ├── foodshock_pipeline.py               # Audit ≥60 months, standardisation, feature engineering
+│   └── run_residual_modeling.py            # Residual forecasting, walk-forward eval, SHAP
+├── app.py                                  # Streamlit entry point (interactive web application)
+├── data_loader.py
+├── models.py
+├── styles.py
+├── utils.py
+├── views/                                  # Streamlit pages
+│   ├── home.py
+│   ├── eda.py
+│   ├── preprocessing.py
+│   ├── training.py
+│   └── prediction.py
+├── data/                                   # Clean artefacts only (no raw >90 MB file)
+│   ├── foodshock_asean_model_ready.csv
+│   ├── fpma_wfp_country_coverage.csv
+│   ├── fpma_wfp_commodity_coverage.csv
+│   ├── model_evaluation_results.csv
+│   ├── model_eval_by_commodity.csv
+│   ├── model_eval_by_country.csv
+│   ├── model_eval_by_pricetype.csv
+│   └── model_eval_shock_classification.csv
+├── figures/
+│   ├── eda_trends.png
+│   ├── model_comparison.png
+│   ├── actual_vs_predicted.png
+│   ├── error_by_commodity.png
+│   ├── shap_summary.png
+│   └── shock_residual_dist.png
+└── user_analysis_example/
+    └── contoh_bulk_test.csv
 ```
 
----
-
-## Methodology & Data Integrity
-
-### Data Audit & Scope
-- Series retained only if **≥ 60 months** of observations.
-- **7 ASEAN countries:** IDN, KHM, LAO, PHL, THA, TLS, MMR.
-- **5 standardized commodity groups** (supported by ≥ 3 countries): Rice, Chicken Meat, Beef Meat, Pork Meat, Cooking Oil.
-- Prices in **USD**; units standardized (KG for rice/meat, L for cooking oil).
-- Explicit separation of `pricetype` (Retail / Wholesale) and `priceflag`.
-
-### Zero Data Leakage
-- Full monthly calendar re-indexing **without forward-filling raw prices**.
-- All lag and rolling features computed from `shift(1)` → features at time *t* use only information up to *t−1*.
-- Time-based (walk-forward) split: last 18 months held out as final test set.
-
-### Residual Forecasting Formulation
-To remove level bias between low-price commodities (Rice ≈ USD 0.77) and high-price commodities (Beef ≈ USD 6.7):
-
-$$
-\Delta y_{t+1} = y_{t+1} - y_t
-$$
-
-$$
-\hat{y}_{t+1} = y_t + \widehat{\Delta y}_{t+1}
-$$
-
-Models are trained on the residual target and predictions are reconstructed to absolute price scale for evaluation.
-
-### Models Compared
-- Baselines: Persistence (lag_1), Seasonal Naive (lag_12)
-- Tree ensembles: Random Forest, XGBoost, LightGBM, CatBoost, HistGradientBoosting
-- Tuned: LightGBM + Optuna (TimeSeriesSplit)
+> **Note on raw data:** The original WFP/HDX extract (`asean_wfp_2015_2025.csv`, ~98 MB) is intentionally **not** included so the repository stays within GitHub file-size limits. The cleaned, model-ready panel is available at `data/foodshock_asean_model_ready.csv`. Raw source: [WFP Food Prices – HDX](https://data.humdata.org/).
 
 ---
 
-## Key Experimental Results
+## Methodology Snapshot
 
-### Overall Model Comparison (Absolute Price after Residual Reconstruction)
+| Component | Detail |
+|-----------|--------|
+| Scope | Series with ≥ 60 months; 7 ASEAN countries; 5 commodity groups (Rice, Chicken Meat, Beef Meat, Pork Meat, Cooking Oil) |
+| Units | USD; KG (rice/meat) / L (cooking oil); explicit Retail vs Wholesale |
+| Leakage control | Full monthly calendar re-index **without** forward-fill of raw prices; lags & rolling from `shift(1)` |
+| Target | Residual: $\Delta y_{t+1}=y_{t+1}-y_t$ → reconstruct $\hat{y}_{t+1}=y_t+\widehat{\Delta y}_{t+1}$ |
+| Validation | Time-based hold-out (last 18 months) |
+| Shock rule | Predicted % change > +5% (or < −5%) → **FOOD SHOCK ALERT** |
 
-| Model                        | MAE    | RMSE   | sMAPE  | R²     |
-|-----------------------------|--------|--------|--------|--------|
-| Persistence (lag_1)         | 0.1479 | 0.2472 | 3.81%  | 0.9887 |
-| **LightGBM_Tuned_Residual** | **0.1509** | **0.2445** | 3.91% | **0.9890** |
-| RandomForest                | 0.1581 | 0.2491 | 4.08%  | 0.9886 |
-| XGBoost                     | 0.1615 | 0.2561 | 4.14%  | 0.9879 |
-| HistGradientBoosting        | 0.1627 | 0.2556 | 4.20%  | 0.9880 |
-| CatBoost                    | 0.1639 | 0.2562 | 4.22%  | 0.9879 |
-| LightGBM                    | 0.1641 | 0.2580 | 4.20%  | 0.9877 |
-| Seasonal Naive (lag_12)     | 0.3142 | 0.4756 | 9.15%  | 0.9583 |
-
-**Key takeaway:** Residual forecasting brings ML models within striking distance of the strong Persistence baseline on MAE, while **outperforming it on RMSE and R²**.
-
-### Stratified Performance (LightGBM_Tuned_Residual)
-
-**By Commodity Group** (selected): Rice and Cooking Oil show the lowest absolute errors; meat products are more volatile.
-
-**By Price Type:**
-| Price Type | MAE    | RMSE   | sMAPE  | n    |
-|------------|--------|--------|--------|------|
-| Retail     | 0.1527 | 0.2468 | 3.88%  | 6812 |
-| Wholesale  | 0.0789 | 0.1237 | 5.18%  | 171  |
-
-### SHAP Key Insights
-- After residual modeling, momentum (`pct_change_*`), volatility (`rolling_std_6`, `cv_6`), and seasonality (`month_sin` / `month_cos`) gain prominence alongside `lag_1`.
-- Country encoding captures structural heterogeneity across ASEAN markets.
-
-### Food Price Shock Classification
-- Definition: |%Δ| > 5% **or** residual > 1.5 × historical training std.
-- Metrics reported in `model_eval_shock_classification.csv` (Precision, Recall, F1, ROC-AUC).
+**Best result (LightGBM Tuned Residual):** RMSE **0.2445** · R² **0.9890** (outperforms Persistence on RMSE & R²).
 
 ---
 
-## Limitations & Future Work
-
-Regression-based residual models are inherently conservative (*regression-to-the-mean*). Consequently, detection of extreme tail shocks (>5%) currently yields modest Precision (≈25%) and low Recall. This is an empirical limitation of one-step-ahead point forecasting on rare events.
-
-**Planned improvements:**
-- Quantile regression (LightGBM / CatBoost quantile loss) to target P90 / P95 residual directly.
-- Dedicated two-stage or binary classifier for the shock label.
-- Incorporation of external drivers (exchange rates, energy prices, weather anomalies, trade flows).
-
----
-
-## How to Reproduce
+## Quick Start
 
 ### 1. Environment
 ```bash
@@ -152,30 +83,54 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Full Pipeline (from raw data)
+### 2. Solution Notebook
 ```bash
-python foodshock_pipeline.py
+jupyter notebook notebooks/FoodShock_MLSC2026_Solution.ipynb
+# or
+jupyter lab notebooks/FoodShock_MLSC2026_Solution.ipynb
 ```
 
-### 3. Residual Modeling Only (uses existing model-ready CSV)
+### 3. Batch Pipeline (optional re-run)
 ```bash
-python run_residual_modeling.py
+# Feature engineering & audit (expects raw CSV if re-running from scratch)
+python src/foodshock_pipeline.py
+
+# Residual modelling, evaluation, SHAP
+python src/run_residual_modeling.py
 ```
 
-### 4. Explore Results
-Open `FoodShock_MLSC2026_Solution.ipynb` in Jupyter Lab / VS Code / GitHub.
+### 4. Interactive Web Application (Streamlit)
+```bash
+streamlit run app.py
+```
+Opens at `http://localhost:8501`.
+
+**Suggested exploration flow**
+1. **Home** — metrics & official benchmark table  
+2. **EDA** — interactive filters & price trends  
+3. **Preprocessing & Audit** — coverage ≥ 60 months proof  
+4. **Model Training** — live Residual vs Direct vs Persistence  
+5. **Prediction & Shock Alert** — what-if case + bulk CSV + alert badges  
 
 ---
 
-## Citation & Acknowledgement
+## Key Results (Official Benchmark)
 
-Dataset: World Food Programme (WFP) / Humanitarian Data Exchange (HDX) – Food Prices.  
-Competition: Machine Learning Solution Challenge (MLSC) – Cyan Academic Competition 2026, Enterprise Data Management (EDM) Laboratory.
+| Model | MAE | RMSE | sMAPE | R² |
+|-------|-----|------|-------|-----|
+| Persistence (lag_1) | 0.1479 | 0.2472 | 3.81% | 0.9887 |
+| **LightGBM_Tuned_Residual** | **0.1509** | **0.2445** | 3.91% | **0.9890** |
+| RandomForest (residual) | 0.1581 | 0.2491 | 4.08% | 0.9886 |
+| XGBoost / CatBoost / HistGB / LGBM | 0.161–0.164 | 0.255–0.258 | ≈4.2% | ≈0.988 |
 
-**Team:** PenaklukFCMobile — Universitas Bina Nusantara  
-**Ketua:** Nicholas Driyadis Tjoe (089602767594)  
-**Anggota:** Christian Caesar · Gerald Amadeo Passover Sutanto
+Stratified metrics (by commodity, country, Retail vs Wholesale) and shock classification scores are in `data/model_eval_*.csv`.
 
 ---
 
-*Built for SDG 2 — Zero Hunger. Designed for transparency, reproducibility, and policy relevance.*
+## Limitations & Future Work
+
+Point residual regression is conservative on rare tail shocks (>5%). Planned upgrades: quantile regression (P90/P95), dedicated shock classifier, and external drivers (FX, energy, weather, trade flows).
+
+---
+
+*FoodShock · MLSC 2026 · SDG 2 — Zero Hunger*

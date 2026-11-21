@@ -26,16 +26,17 @@ env/
 .DS_Store
 Thumbs.db
 
-# Optuna / experiment logs
+# Experiment / logs
 optuna.db
 *.log
 pipeline_log*.txt
 residual_log.txt
 
-# Large intermediate (keep final deliverables)
-submission_tmp/
-*.zip.bak
+# Large raw data (keep out of GitHub)
+asean_wfp_2015_2025.csv
+**/asean_wfp_2015_2025.csv
+*.csv.bak
 
-# Secrets / local config
+# Secrets
 .env
 *.pem
