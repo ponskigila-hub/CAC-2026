@@ -1,0 +1,41 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Optuna / experiment logs
+optuna.db
+*.log
+pipeline_log*.txt
+residual_log.txt
+
+# Large intermediate (keep final deliverables)
+submission_tmp/
+*.zip.bak
+
+# Secrets / local config
+.env
+*.pem
