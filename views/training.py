@@ -19,7 +19,7 @@ def render():
 
     st.markdown(
         hero("Model Training & Evaluation",
-             "Residual vs Direct forecasting · live hyperparameters · time-based validation",
+             "Residual vs Direct · live hyperparameters · expanding / time-based validation",
              pills=[("Walk-Forward", "pill-sky"), ("vs Persistence", "pill-amber")]),
         unsafe_allow_html=True,
     )
@@ -79,7 +79,7 @@ def render():
             if len(train_df) < 200:
                 st.error("Too few rows after filtering.")
             else:
-                with st.spinner("Training (time-based split, last 18 months test)..."):
+                with st.spinner("Training with time-based hold-out (configure filters; full paper uses 6-fold expanding walk-forward)..."):
                     try:
                         out = train_and_evaluate(
                             train_df, algorithm=algorithm, target_mode=target_mode,

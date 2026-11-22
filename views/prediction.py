@@ -45,7 +45,7 @@ def render():
 
     st.markdown(
         hero("Testing & Early Shock Detection",
-             "What-if simulation · bulk CSV scoring · Food Shock alert badges",
+             "What-if simulation · P10–P90 intervals · Stage-2 shock probability · alert badges",
              pills=[("t+1 Forecast", "pill-sky"), ("Early Warning", "pill-amber")]),
         unsafe_allow_html=True,
     )
@@ -131,11 +131,13 @@ def render():
 
             st.markdown(
                 """
-                | Status | Condition |
-                |--------|-----------|
-                | **NORMAL** | |%Δ| < 3% |
-                | **WASPADA / MODERATE** | 3% ≤ |%Δ| ≤ 5% |
-                | **FOOD SHOCK ALERT** | |%Δ| > 5% |
+                | Status | Operational rule (demo) |
+                |--------|-------------------------|
+                | **NORMAL** | Predicted %Δ < 3% and low Stage-2 risk |
+                | **WASPADA / ELEVATED RISK** | 3–5% move or moderate shock probability |
+                | **FOOD SHOCK ALERT** | %Δ > 5% (policy ALPS/AFSIS) or high Stage-2 probability (opt. thr. ≈ 0.35) |
+
+                Full production alerts combine **point forecast**, **P90 upside bound**, and **calibrated Stage-2 probability**.
                 """
             )
 
