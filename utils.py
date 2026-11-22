@@ -18,7 +18,22 @@ FEATURE_COLS = [
 
 CAT_COLS = ["countryiso3", "commodity_group", "pricetype"]
 
-SHOCK_PROB_THRESHOLD = 0.50
+_DEFAULT_SHOCK_PROB_THRESHOLD = 0.67
+
+def get_shock_prob_threshold() -> float:
+    """Operational threshold from pipeline artefact; fallback to constant."""
+    from pathlib import Path as _P
+    for p in (_P(__file__).resolve().parent / "data" / "app_shock_threshold.txt",
+              _P("data/app_shock_threshold.txt")):
+        try:
+            if p.exists():
+                return float(p.read_text().strip().split()[0])
+        except Exception:
+            pass
+    return float(_DEFAULT_SHOCK_PROB_THRESHOLD)
+
+# Back-compat alias (evaluated at import; prefer get_shock_prob_threshold() at runtime)
+SHOCK_PROB_THRESHOLD = get_shock_prob_threshold()
 SHOCK_PCT_THRESHOLD = 0.05
 
 
@@ -45,22 +60,17 @@ def pct_change_from_prices(current: float, predicted: float) -> float:
 
 def classify_shock(pct_change: float, shock_proba: float | None = None) -> tuple[str, str]:
     """
-    Combine policy % threshold and Stage-2 probability.
-    Returns (label, color_hex).
+    Upward affordability shock (SDG 2.c): +5% MoM policy tail + Stage-2 probability.
+    pct_change may be fraction (0.05) or percent (5.0).
     """
     pct = float(pct_change)
-    if abs(pct) < 1.5:  # fraction vs already-percent
-        pct_pct = pct * 100
-    else:
-        pct_pct = pct
-
+    pct_frac = pct / 100.0 if abs(pct) > 1.5 else pct
     proba = float(shock_proba) if shock_proba is not None else 0.0
-    high_prob = proba >= SHOCK_PROB_THRESHOLD
-    high_move = abs(pct_pct) > SHOCK_PCT_THRESHOLD * 100
-
-    if high_prob or high_move:
+    high_prob = proba >= get_shock_prob_threshold()
+    high_up = pct_frac > SHOCK_PCT_THRESHOLD
+    if high_prob or high_up:
         return "FOOD SHOCK ALERT", "#F43F5E"
-    if abs(pct_pct) >= 3.0 or proba >= 0.25:
+    if pct_frac >= 0.03 or proba >= 0.25:
         return "WASPADA / ELEVATED RISK", "#F59E0B"
     return "NORMAL", "#10B981"
 

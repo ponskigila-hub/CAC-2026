@@ -8,7 +8,7 @@ from models import predict_two_stage, train_and_evaluate, available_algorithms
 from styles import inject_css, hero, section, status_badge
 from utils import (
     classify_shock, pct_change_from_prices, FEATURE_COLS,
-    SHOCK_PROB_THRESHOLD, ensure_feature_row,
+    get_shock_prob_threshold, ensure_feature_row,
 )
 
 
@@ -29,7 +29,7 @@ def _ensure_default_model():
 
     df = load_model_ready()
     algs = available_algorithms()
-    alg = "LightGBM" if "LightGBM" in algs else algs[0]
+    alg = "CatBoost" if "CatBoost" in algs else (algs[0] if algs else "HistGradientBoosting")
     with st.spinner("Initialising two-stage residual model (point + P10/P90 + shock classifier)..."):
         out = train_and_evaluate(
             df, algorithm=alg, target_mode="residual",
@@ -70,7 +70,7 @@ def render():
         hero(
             "Testing & Early Shock Detection",
             "Interactive what-if simulation · P10–P90 intervals · Stage-2 shock probability · alert badges",
-            pills=[("Two-Stage V2", "pill-sky"), (f"P(Shock) ≥ {SHOCK_PROB_THRESHOLD}", "pill-amber")],
+            pills=[("Two-Stage V2", "pill-sky"), (f"P(Shock) ≥ {get_shock_prob_threshold()}", "pill-amber")],
         ),
         unsafe_allow_html=True,
     )
@@ -80,7 +80,7 @@ def render():
     st.caption(
         f"Active mode: **{bundle.get('target_mode', 'residual')}** · "
         f"{len(bundle.get('feature_names', []))} features · "
-        f"Stage-2 threshold = {SHOCK_PROB_THRESHOLD}"
+        f"Stage-2 threshold = {get_shock_prob_threshold()}"
     )
 
     df = load_model_ready()
@@ -180,7 +180,7 @@ def render():
             |--------|------|
             | **NORMAL** | mild %Δ and low Stage-2 probability |
             | **WASPADA / ELEVATED RISK** | ~3–5% move or moderate P(Shock) |
-            | **FOOD SHOCK ALERT** | P(Shock) ≥ **{SHOCK_PROB_THRESHOLD}** or |%Δ| > **+5%** (ALPS/AFSIS) |
+            | **FOOD SHOCK ALERT** | P(Shock) ≥ **{get_shock_prob_threshold()}** or predicted rise > **+5%** (ALPS/AFSIS) |
             """
         )
 

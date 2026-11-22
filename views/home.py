@@ -87,7 +87,7 @@ def render():
             <div class="flow-step"><div class="num">STEP 04</div><div class="title">Quantile P10–P90</div>
             <div class="desc">Upside tail interval · PICP ≈ 80%</div></div>
             <div class="flow-step"><div class="num">STEP 05</div><div class="title">Shock Classifier</div>
-            <div class="desc">P(Shock) · thr≈0.50 · ALPS +5%</div></div>
+            <div class="desc">P(Shock) · thr ≈ operational · ALPS +5%</div></div>
         </div>
         """,
         unsafe_allow_html=True,

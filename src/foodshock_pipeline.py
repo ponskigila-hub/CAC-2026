@@ -259,9 +259,9 @@ def stage2_feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
         g["cv_6"] = g["rolling_std_6"] / g["rolling_mean_6"]
 
         # Momentum / pct change (using past)
-        g["pct_change_1m"] = shifted.pct_change(1)
-        g["pct_change_3m"] = shifted.pct_change(3)
-        g["pct_change_12m"] = shifted.pct_change(12)
+        g["pct_change_1m"] = shifted.pct_change(1, fill_method=None)
+        g["pct_change_3m"] = shifted.pct_change(3, fill_method=None)
+        g["pct_change_12m"] = shifted.pct_change(12, fill_method=None)
 
         # Seasonal
         month = g["year_month"].dt.month

@@ -1,7 +1,9 @@
-Shock threshold justification
-Policy: WFP ALPS / AFSIS acute affordability stress (~+5% MoM food price spike)
-Empirical: target_pct_change_t1 P90≈+4.44%, P95≈+7.20%, IQR≈[-1.89%, +1.77%]; +5% isolates ~8.5–9% upper-tail events; combined with adaptive series μ+1.5σ in monitoring.
-Stage-2 LGBMClassifier regularized: n_estimators=150, max_depth=4, min_child_samples=50, reg_lambda=5.0, subsample=0.8, colsample_bytree=0.8, learning_rate=0.03, class_weight=balanced.
-Classifier optimal probability threshold (F1): 0.500
-OOF metrics: Precision=0.255, Recall=0.464, F1=0.330, ROC-AUC=0.628, PR-AUC=0.250
-PICP P10-P90: 0.803
+Shock: upward only target_pct_change_t1 > +0.05 (SDG 2.c).
+Threshold: chosen inside each train fold on month-block validation (no row-wise month split).
+F1-optimal mean thr=0.400; Operational (prec>=0.2 or F0.5) mean thr=0.633.
+Threshold folds: precision_floor=5 f0.5_fallback=1
+Ops metrics: P=0.163 R=0.192 F1=0.176 FDR=0.837 FPR=0.097
+F1 metrics: P=0.121 R=0.641 F1=0.204
+Momentum: P=0.136 R=0.133 PR-AUC=0.102 ROC=0.494
+Conformalized quantile overall PICP=0.802 mean width=0.2919
+FX features: from WFP price/usdprice when raw present; else precomputed columns in model-ready CSV.
