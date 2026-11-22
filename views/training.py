@@ -1,4 +1,4 @@
-"""Interactive model training — residual vs direct."""
+"""Interactive model training — V2 residual + two-stage artefacts."""
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from data_loader import (
-    load_model_ready, load_model_results,
+    load_model_ready, load_model_results, load_shock_metrics,
     load_eval_by_commodity, load_eval_by_pricetype, get_filter_options,
 )
 from models import available_algorithms, train_and_evaluate
@@ -18,20 +18,34 @@ def render():
     apply_plot_style()
 
     st.markdown(
-        hero("Model Training & Evaluation",
-             "Residual vs Direct · live hyperparameters · expanding / time-based validation",
-             pills=[("Walk-Forward", "pill-sky"), ("vs Persistence", "pill-amber")]),
+        hero(
+            "Model Training & Evaluation",
+            "Residual vs Direct · live hyperparameters · expanding / time-based validation",
+            pills=[("Walk-Forward V2", "pill-sky"), ("vs Persistence", "pill-amber")],
+        ),
         unsafe_allow_html=True,
     )
 
-    st.markdown(section("Official Benchmark (pre-computed)"), unsafe_allow_html=True)
+    st.markdown(section("Official Walk-Forward Benchmark (pre-computed)"), unsafe_allow_html=True)
     results = load_model_results()
+    show_cols = [c for c in [
+        "model", "MAE_micro", "RMSE_micro", "sMAPE_micro", "R2_micro",
+        "MAE_macro", "SS_RMSE", "DM_stat", "DM_pvalue",
+    ] if c in results.columns]
+    if not show_cols:
+        show_cols = list(results.columns)
+    fmt = {c: "{:.4f}" for c in show_cols if c != "model"}
     st.dataframe(
-        results.sort_values("MAE").style.format(
-            {"MAE": "{:.4f}", "RMSE": "{:.4f}", "sMAPE": "{:.2f}", "R2": "{:.4f}"}
-        ),
+        results[show_cols].style.format(fmt, na_rep="—"),
         use_container_width=True, hide_index=True,
     )
+
+    st.markdown(section("Stage-2 Shock Classifier (Walk-Forward OOF)"), unsafe_allow_html=True)
+    shock = load_shock_metrics()
+    if len(shock):
+        st.dataframe(shock.style.format(precision=4), use_container_width=True, hide_index=True)
+    else:
+        st.warning("model_eval_shock_classification.csv not found")
 
     t1, t2 = st.tabs(["By Commodity", "By Price Type"])
     with t1:
@@ -41,10 +55,13 @@ def render():
 
     st.markdown("---")
     st.markdown(section("Interactive Training Panel"), unsafe_allow_html=True)
+    st.caption(
+        "Interactive runs use a **time-based hold-out** (last N months) for speed. "
+        "Paper results use **6-fold expanding-window walk-forward** (see benchmark table above)."
+    )
 
     df = load_model_ready()
     opts = get_filter_options(df)
-
     left, right = st.columns([1, 1.15])
 
     with left:
@@ -54,8 +71,7 @@ def render():
             "Target Approach",
             options=["residual", "direct"],
             format_func=lambda x: (
-                "Residual (Δy = yₜ₊₁ − yₜ)" if x == "residual"
-                else "Direct (yₜ₊₁)"
+                "Residual (Δy = yₜ₊₁ − yₜ)" if x == "residual" else "Direct (yₜ₊₁)"
             ),
         )
         sel_countries = st.multiselect("Countries (empty = All)", opts["countries"])
@@ -79,7 +95,7 @@ def render():
             if len(train_df) < 200:
                 st.error("Too few rows after filtering.")
             else:
-                with st.spinner("Training with time-based hold-out (configure filters; full paper uses 6-fold expanding walk-forward)..."):
+                with st.spinner("Training point + quantile + shock classifier..."):
                     try:
                         out = train_and_evaluate(
                             train_df, algorithm=algorithm, target_mode=target_mode,
@@ -91,27 +107,39 @@ def render():
                         out = None
 
                 if out:
-                    st.session_state["trained_model"] = out["model"]
+                    # Persist full two-stage bundle
+                    for k in ("model", "q10_model", "q90_model", "shock_clf",
+                              "encoders", "feature_names", "target_mode", "metrics"):
+                        st.session_state[k if k != "model" else "trained_model"] = out[k]
                     st.session_state["trained_encoders"] = out["encoders"]
                     st.session_state["trained_features"] = out["feature_names"]
                     st.session_state["trained_mode"] = out["target_mode"]
                     st.session_state["trained_metrics"] = out["metrics"]
+                    st.session_state["q10_model"] = out["q10_model"]
+                    st.session_state["q90_model"] = out["q90_model"]
+                    st.session_state["shock_clf"] = out["shock_clf"]
+                    st.session_state["two_stage_bundle"] = {
+                        "model": out["model"],
+                        "q10_model": out["q10_model"],
+                        "q90_model": out["q90_model"],
+                        "shock_clf": out["shock_clf"],
+                        "encoders": out["encoders"],
+                        "feature_names": out["feature_names"],
+                        "target_mode": out["target_mode"],
+                    }
 
                     m = out["metrics"]
                     st.success(f"Done · train={m['n_train']:,} · test={m['n_test']:,}")
-
-                    mae_delta = m["MAE"] - m["Persistence_MAE"]
-                    rmse_delta = m["RMSE"] - m["Persistence_RMSE"]
                     d1, d2, d3, d4 = st.columns(4)
-                    d1.metric("MAE", f"{m['MAE']:.4f}", f"{mae_delta:+.4f} vs Pers.")
-                    d2.metric("RMSE", f"{m['RMSE']:.4f}", f"{rmse_delta:+.4f} vs Pers.")
+                    d1.metric("MAE", f"{m['MAE']:.4f}", f"{m['MAE']-m['Persistence_MAE']:+.4f} vs Pers.")
+                    d2.metric("RMSE", f"{m['RMSE']:.4f}", f"{m['RMSE']-m['Persistence_RMSE']:+.4f} vs Pers.")
                     d3.metric("sMAPE", f"{m['sMAPE']:.2f}%")
-                    d4.metric("R²", f"{m['R2']:.4f}")
+                    d4.metric("PICP P10–P90", f"{m.get('PICP_P10_P90', float('nan'))*100:.1f}%")
 
                     comp = pd.DataFrame([
                         {"Model": m["model"], "MAE": m["MAE"], "RMSE": m["RMSE"],
                          "sMAPE": m["sMAPE"], "R2": m["R2"]},
-                        {"Model": "Persistence (lag_1)", "MAE": m["Persistence_MAE"],
+                        {"Model": "Persistence (y_t)", "MAE": m["Persistence_MAE"],
                          "RMSE": m["Persistence_RMSE"], "sMAPE": m["Persistence_sMAPE"],
                          "R2": m["Persistence_R2"]},
                     ])

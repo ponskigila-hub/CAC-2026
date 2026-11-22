@@ -37,7 +37,7 @@ with st.sidebar:
         <div class="sidebar-stats">
             <strong>7</strong> ASEAN countries<br/>
             <strong>5</strong> commodity groups<br/>
-            <strong>28,172</strong> clean observations<br/>
+            <strong>27,950</strong> clean observations<br/>
             Residual forecasting · Zero leakage
         </div>
         """,

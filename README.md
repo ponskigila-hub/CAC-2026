@@ -8,42 +8,68 @@
 **Organizer:** Enterprise Data Management (EDM) Laboratory  
 **Target SDG:** **SDG 2 — Zero Hunger**
 
-FoodShock forecasts monthly food prices across ASEAN markets and issues early warnings for potential price shocks, supporting price stability monitoring and policy readiness under SDG 2.
+FoodShock forecasts monthly staple-food prices across ASEAN markets and issues early warnings for potential price shocks, supporting price-stability monitoring under SDG 2.
 
 ---
 
-## Repository Structure
+## Shock Threshold Justification (+5% MoM)
+
+1. **Policy foundation:** Aligned with the WFP **ALPS (Alert for Price Spikes)** framework and ASEAN Food Security Information System (**AFSIS**) monitoring practice, where a month-over-month staple-food increase above **+5%** signals acute affordability stress (roughly equivalent to >60% annualised food inflation if sustained).
+2. **Empirical foundation:** On the ASEAN panel return distribution (`target_pct_change_t1`), **P90 ≈ +4.44%** and **P95 ≈ +7.20%** (IQR ≈ [−1.89%, +1.77%]). The **+5.0%** rule isolates the upper ~8.5–9% tail, and is combined with adaptive series-specific monitoring (μᵢ + 1.5σᵢ) and a **calibrated Stage-2 probability threshold** (optimal F1 threshold ≈ 0.35).
+
+---
+
+## Architectural Rationale & Methodological Alignment
+
+| Stage | What we do | Why it fits the problem |
+|-------|------------|-------------------------|
+| **1. Audit ≥ 60 months & unit standardisation** | Keep series with ≥ 60 months; convert to USD; KG (rice/meat) / L (oil) | Short series cannot support seasonal lags; mixed currencies/units create artificial scale bias |
+| **2. Calendar-safe FE (zero leakage)** | Full monthly re-index **without** forward-fill of raw prices; lags/rolling from `shift(1)` | Forward-filling empty months invents 0% changes and leaks future levels into rolling stats |
+| **3. Macro: implied FX & ASEAN spillover** | `fx_pct_1m/3m`, `fx_vol_6m` from price/usdprice; regional commodity momentum + country gap | Local food inflation often tracks FX depreciation and regional supply shocks, not only local lags |
+| **4. Residual target** \(\Delta y_{t+1}=y_{t+1}-y_t\) from **current** \(y_t\) (`usdprice`) | Train on changes; reconstruct \(\hat y_{t+1}=y_t+\widehat{\Delta y}\) | Rice (~USD 0.8) vs beef (~USD 6–7) differ ~9×; level targets bias trees toward expensive goods |
+| **5. 6-fold expanding-window walk-forward + DM test** | Cutoffs 2019-06…2024-06; 12-month test each; micro & macro metrics; Diebold–Mariano vs Persistence | All **7 countries** (incl. IDN, THA) receive OOS evaluation where data exist; significance is tested, not assumed |
+| **6. Two-stage risk layer** | Point residual + Quantile **P10–P90** (PICP ≈ **80.3%**) + balanced **Stage-2 classifier** (Recall ≈ **56.4%**, F1 ≈ **0.309**, thr ≈ 0.35) | Point forecasts regress to the mean on rare shocks; probability + upside interval operationalise ALPS/AFSIS alerts |
+| **7. 5-page Streamlit app** | Home, EDA, Preprocessing, Training, Prediction (what-if + bulk CSV) | Turns the pipeline into a usable early-warning tool for analysts |
+
+---
+
+## Repository Structure (42 entries)
 
 ```
 .
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── notebooks/
-│   └── FoodShock_MLSC2026_Solution.ipynb   # Full solution notebook (tables & figures embedded)
+├── README.md                          # Project docs, methodology, results, quick start
+├── requirements.txt                   # Reproducible Python dependencies
+├── .gitignore                         # Excludes venv, caches, raw >90MB extracts
+├── app.py                             # Streamlit entry: 5-page navigation + sidebar stats
+├── data_loader.py                     # Cached CSV loaders for app pages
+├── models.py                          # Two-stage V2: residual point, P10/P90, shock classifier
+├── utils.py                           # sMAPE, residual reconstruction, alert rules, FEATURE_COLS
+├── styles.py                          # Dark analytics theme, KPI cards, status badges
+├── .streamlit/
+│   └── config.toml                    # Streamlit theme (emerald SDG-2 accent)
 ├── src/
-│   ├── foodshock_pipeline.py               # Audit ≥60 months, standardisation, feature engineering
-│   └── run_residual_modeling.py            # Residual forecasting, walk-forward eval, SHAP
-├── app.py                                  # Streamlit entry point (interactive web application)
-├── data_loader.py
-├── models.py
-├── styles.py
-├── utils.py
-├── views/                                  # Streamlit pages
-│   ├── home.py
-│   ├── eda.py
-│   ├── preprocessing.py
-│   ├── training.py
-│   └── prediction.py
-├── data/                                   # Clean artefacts only (no raw >90 MB file)
-│   ├── foodshock_asean_model_ready.csv
+│   ├── foodshock_pipeline.py          # Audit ≥60m, unit std, calendar-safe FE (batch)
+│   ├── run_residual_modeling.py       # V1 residual baseline / SHAP helper
+│   └── run_upgraded_v2.py             # V2: FX/spillover, 6-fold WF, Optuna, DM, quantiles, classifier
+├── notebooks/
+│   └── FoodShock_MLSC2026_Solution.ipynb  # Full narrative + embedded V2 outputs
+├── views/
+│   ├── __init__.py
+│   ├── home.py                        # KPI, architecture flow, WF benchmark, Stage-2 metrics
+│   ├── eda.py                         # Interactive filters & trends
+│   ├── preprocessing.py               # Audit transparency & integrity rules
+│   ├── training.py                    # Official tables + live train residual vs direct
+│   └── prediction.py                  # What-if & bulk CSV with P10–P90 and P(Shock)
+├── data/
+│   ├── foodshock_asean_model_ready.csv    # Clean panel 27,950 × 38 (0 NaN/Inf)
 │   ├── fpma_wfp_country_coverage.csv
 │   ├── fpma_wfp_commodity_coverage.csv
-│   ├── model_evaluation_results.csv
+│   ├── model_evaluation_results.csv       # WF micro/macro, SS_RMSE, DM tests
 │   ├── model_eval_by_commodity.csv
 │   ├── model_eval_by_country.csv
-│   ├── model_eval_by_pricetype.csv
-│   └── model_eval_shock_classification.csv
+│   ├── model_eval_by_pricetype.csv        # Retail n=22,506 · Wholesale n=1,385 (OOS)
+│   ├── model_eval_shock_classification.csv
+│   └── shock_threshold_justification.txt
 ├── figures/
 │   ├── eda_trends.png
 │   ├── model_comparison.png
@@ -52,32 +78,38 @@ FoodShock forecasts monthly food prices across ASEAN markets and issues early wa
 │   ├── shap_summary.png
 │   └── shock_residual_dist.png
 └── user_analysis_example/
-    └── contoh_bulk_test.csv
+    └── contoh_bulk_test.csv           # Sample bulk prediction CSV
 ```
 
-> **Note on raw data:** The original WFP/HDX extract (`asean_wfp_2015_2025.csv`, ~98 MB) is intentionally **not** included so the repository stays within GitHub file-size limits. The cleaned, model-ready panel is available at `data/foodshock_asean_model_ready.csv`. Raw source: [WFP Food Prices – HDX](https://data.humdata.org/).
+> **Raw data note:** The original WFP/HDX extract (`asean_wfp_2015_2025.csv`, ~98 MB) is **not** shipped (GitHub size limits). The model-ready panel is `data/foodshock_asean_model_ready.csv`. Source: [WFP Food Prices – HDX](https://data.humdata.org/).
 
 ---
 
+## Key Results (Expanding-Window Walk-Forward, 6 annual folds)
 
-## Shock Threshold Justification (+5% MoM)
+Validation: expanding train → next 12 months at cutoffs 2019-06 … 2024-06. **All 7 ASEAN countries** appear in out-of-sample windows (including IDN & THA on folds where data exist). Metrics are **micro-averaged**; macro-MAE averages countries with equal weight.
 
-1. **Policy foundation:** Aligned with the WFP **ALPS (Alert for Price Spikes)** framework and ASEAN Food Security Information System (**AFSIS**) monitoring practice, where a month-over-month staple-food increase above **+5%** signals acute affordability stress (roughly equivalent to >60% annualised food inflation if sustained).
-2. **Empirical foundation:** On the ASEAN panel return distribution (`target_pct_change_t1`), **P90 ≈ +4.44%** and **P95 ≈ +7.20%** (IQR ≈ [−1.89%, +1.77%]). The **+5.0%** rule therefore isolates the upper ~8.5–9% tail, and is combined with adaptive series-specific monitoring (μᵢ + 1.5σᵢ) and a **calibrated Stage-2 probability threshold** (optimal F1 threshold ≈ 0.35).
+| Model | MAE (micro) | RMSE (micro) | sMAPE | SS_RMSE vs Pers. | DM p-value |
+|-------|-------------|--------------|-------|------------------|------------|
+| **CatBoost WF Residual** | 0.0984 | **0.1931** | 3.06% | **+0.010** | **< 0.001** |
+| **XGBoost WF Residual** | 0.0995 | **0.1930** | 3.09% | **+0.010** | **0.040** |
+| LightGBM WF Residual | 0.0997 | 0.1937 | 3.14% | +0.007 | < 0.001 |
+| Persistence (y_t) | 0.0986 | 0.1950 | 3.04% | 0.000 | — |
+| HistGradientBoosting WF | 0.1015 | 0.1952 | 3.18% | ≈0 | 0.80 |
+| RandomForest WF | 0.1017 | 0.1971 | 3.14% | −0.010 | — |
 
-## Methodology Snapshot
+**Interpretation:** Monthly food prices are near-martingale; Persistence is strong on MAE. Value-add is shown by **lower RMSE**, positive **skill scores**, **Diebold–Mariano significance** for boosted residual models, **quantile PICP ≈ 80%**, and the Stage-2 classifier.
 
-| Component | Detail |
-|-----------|--------|
-| Scope | Series with ≥ 60 months; 7 ASEAN countries; 5 commodity groups (Rice, Chicken Meat, Beef Meat, Pork Meat, Cooking Oil) |
-| Units | USD; KG (rice/meat) / L (cooking oil); explicit Retail vs Wholesale |
-| Leakage control | Full monthly calendar re-index **without** forward-fill of raw prices; lags & rolling from `shift(1)` |
-| Macro features | Implied FX (`fx_pct_1m/3m`, `fx_vol_6m`); ASEAN commodity momentum & country-vs-region gap |
-| Target | Residual from **current** price $y_t$ (`usdprice`): $\Delta y_{t+1}=y_{t+1}-y_t$ → reconstruct $\hat{y}_{t+1}=y_t+\widehat{\Delta y}_{t+1}$ |
-| Validation | Expanding-window walk-forward (6 annual folds, 2019–2025) |
-| Shock rule | Predicted % change > +5% (or < −5%) → **FOOD SHOCK ALERT** |
+### Stage-2 Shock Classifier (Walk-Forward OOF)
 
-**Best result (LightGBM Tuned Residual):** RMSE **0.2445** · R² **0.9890** (outperforms Persistence on RMSE & R²).
+| Precision | Recall | F1 | ROC-AUC | PR-AUC | Base rate | Opt. threshold |
+|-----------|--------|-----|---------|--------|-----------|----------------|
+| 0.213 | **0.564** | **0.309** | 0.605 | 0.228 | 0.162 | 0.35 |
+
+### Stratified OOS counts (walk-forward)
+
+- **Retail** n = 22,506 · **Wholesale** n = 1,385  
+- Countries with OOS rows: IDN, KHM, LAO, MMR, PHL, THA, TLS  
 
 ---
 
@@ -93,62 +125,33 @@ pip install -r requirements.txt
 ### 2. Solution Notebook
 ```bash
 jupyter notebook notebooks/FoodShock_MLSC2026_Solution.ipynb
-# or
-jupyter lab notebooks/FoodShock_MLSC2026_Solution.ipynb
 ```
 
 ### 3. Batch Pipeline (optional re-run)
 ```bash
-# Feature engineering & audit (expects raw CSV if re-running from scratch)
-python src/foodshock_pipeline.py
-
-# Residual modelling, evaluation, SHAP
-python src/run_residual_modeling.py
+python src/foodshock_pipeline.py      # requires local raw WFP extract if rebuilding from scratch
+python src/run_upgraded_v2.py         # V2 walk-forward + two-stage artefacts
 ```
 
 ### 4. Interactive Web Application (Streamlit)
 ```bash
 streamlit run app.py
 ```
-Opens at `http://localhost:8501`.
 
 **Suggested exploration flow**
-1. **Home** — metrics & official benchmark table  
+1. **Home** — KPIs & official walk-forward benchmark  
 2. **EDA** — interactive filters & price trends  
-3. **Preprocessing & Audit** — coverage ≥ 60 months proof  
+3. **Preprocessing** — coverage ≥ 60 months proof  
 4. **Model Training** — live Residual vs Direct vs Persistence  
-5. **Prediction & Shock Alert** — what-if case + bulk CSV + alert badges  
+5. **Prediction & Alert** — what-if + bulk CSV + P10–P90 + P(Shock)  
 
 ---
 
-## Key Results (Expanding-Window Walk-Forward, 6 annual folds)
-
-Validation: expanding train → next 12 months test at cutoffs 2019-06 … 2024-06. **All 7 ASEAN countries** appear in out-of-sample windows (including IDN & THA in earlier folds). Metrics are **micro-averaged** over observations; macro-MAE averages countries with equal weight.
-
-| Model | MAE (micro) | RMSE (micro) | sMAPE | SS_RMSE vs Pers. | DM p-value |
-|-------|-------------|--------------|-------|------------------|------------|
-| **CatBoost WF Residual** | 0.0984 | **0.1931** | 3.06% | **+0.010** | **< 0.001** |
-| **XGBoost WF Residual** | 0.0995 | **0.1930** | 3.09% | **+0.010** | **0.040** |
-| LightGBM WF Residual | 0.0997 | 0.1937 | 3.14% | +0.007 | < 0.001 |
-| Persistence (y_t) | 0.0986 | 0.1950 | 3.04% | 0.000 | — |
-| HistGradientBoosting WF | 0.1015 | 0.1952 | 3.18% | ≈0 | 0.80 |
-| RandomForest WF | 0.1017 | 0.1971 | 3.14% | −0.010 | — |
-
-**Interpretation:** Monthly food prices are near-martingale; Persistence is a strong baseline on MAE. Value-add is evidenced by **lower RMSE**, positive **skill scores**, and **Diebold–Mariano significance** for gradient-boosted residual models, plus **quantile PICP ≈ 80%** (P10–P90) and a dedicated shock classifier.
-
-### Stage-2 Shock Classifier (Walk-Forward OOF)
-
-| Precision | Recall | F1 | ROC-AUC | PR-AUC | Base rate | Opt. threshold |
-|-----------|--------|-----|---------|--------|-----------|----------------|
-| 0.213 | **0.564** | **0.309** | 0.605 | 0.228 | 0.162 | 0.35 |
-
-Recall and F1 substantially exceed a non-informative baseline; alerts use calibrated probabilities rather than a hard 5% rule on the point forecast alone.
-
-
-
 ## Limitations & Future Work
 
-Point residual regression is conservative on rare tail shocks (>5%). Planned upgrades: quantile regression (P90/P95), dedicated shock classifier, and external drivers (FX, energy, weather, trade flows).
+Monthly staple prices behave like a near-martingale: Persistence remains competitive on MAE. The system’s value is concentrated in **RMSE skill**, **Diebold–Mariano significance**, **P10–P90 coverage (PICP ≈ 80%)**, and **Stage-2 recall on rare shocks** rather than large mean-error gaps.
+
+Current limitations include sparse coverage for some country–commodity cells (e.g., THA, MMR), the absence of harmonised weather/energy covariates across all seven countries, and still-moderate precision on the shock classifier. Future work: richer external drivers, conformal or quantile ensembles, and cost-sensitive thresholding for operational AFSIS dashboards.
 
 ---
 
