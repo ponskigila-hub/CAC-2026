@@ -87,7 +87,7 @@ def render():
             <div class="flow-step"><div class="num">STEP 04</div><div class="title">Quantile P10–P90</div>
             <div class="desc">Upside tail interval · PICP ≈ 80%</div></div>
             <div class="flow-step"><div class="num">STEP 05</div><div class="title">Shock Classifier</div>
-            <div class="desc">P(Shock) · thr≈0.35 · ALPS +5%</div></div>
+            <div class="desc">P(Shock) · thr≈0.50 · ALPS +5%</div></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -118,7 +118,7 @@ def render():
         c5.metric("PICP P10–P90", f"{float(s.get('PICP_P10_P90', float('nan')))*100:.1f}%")
         st.caption(
             f"Base rate={float(s.get('Base_Rate', 0)):.3f} · "
-            f"Optimal probability threshold={float(s.get('Optimal_Threshold', 0.35)):.2f} · "
+            f"Optimal probability threshold={float(s.get('Optimal_Threshold', 0.50)):.2f} · "
             f"Policy MoM threshold=+5% (WFP ALPS / AFSIS)"
         )
     else:

@@ -15,7 +15,7 @@ FoodShock forecasts monthly staple-food prices across ASEAN markets and issues e
 ## Shock Threshold Justification (+5% MoM)
 
 1. **Policy foundation:** Aligned with the WFP **ALPS (Alert for Price Spikes)** framework and ASEAN Food Security Information System (**AFSIS**) monitoring practice, where a month-over-month staple-food increase above **+5%** signals acute affordability stress (roughly equivalent to >60% annualised food inflation if sustained).
-2. **Empirical foundation:** On the ASEAN panel return distribution (`target_pct_change_t1`), **P90 ≈ +4.44%** and **P95 ≈ +7.20%** (IQR ≈ [−1.89%, +1.77%]). The **+5.0%** rule isolates the upper ~8.5–9% tail, and is combined with adaptive series-specific monitoring (μᵢ + 1.5σᵢ) and a **calibrated Stage-2 probability threshold** (optimal F1 threshold ≈ 0.35).
+2. **Empirical foundation:** On the ASEAN panel return distribution (`target_pct_change_t1`), **P90 ≈ +4.44%** and **P95 ≈ +7.20%** (IQR ≈ [−1.89%, +1.77%]). The **+5.0%** rule isolates the upper ~8.5–9% tail, and is combined with adaptive series-specific monitoring (μᵢ + 1.5σᵢ) and a **calibrated Stage-2 probability threshold** (optimal F1 threshold ≈ 0.50).
 
 ---
 
@@ -28,12 +28,12 @@ FoodShock forecasts monthly staple-food prices across ASEAN markets and issues e
 | **3. Macro: implied FX & ASEAN spillover** | `fx_pct_1m/3m`, `fx_vol_6m` from price/usdprice; regional commodity momentum + country gap | Local food inflation often tracks FX depreciation and regional supply shocks, not only local lags |
 | **4. Residual target** \(\Delta y_{t+1}=y_{t+1}-y_t\) from **current** \(y_t\) (`usdprice`) | Train on changes; reconstruct \(\hat y_{t+1}=y_t+\widehat{\Delta y}\) | Rice (~USD 0.8) vs beef (~USD 6–7) differ ~9×; level targets bias trees toward expensive goods |
 | **5. 6-fold expanding-window walk-forward + DM test** | Cutoffs 2019-06…2024-06; 12-month test each; micro & macro metrics; Diebold–Mariano vs Persistence | All **7 countries** (incl. IDN, THA) receive OOS evaluation where data exist; significance is tested, not assumed |
-| **6. Two-stage risk layer** | Point residual + Quantile **P10–P90** (PICP ≈ **80.3%**) + balanced **Stage-2 classifier** (Recall ≈ **56.4%**, F1 ≈ **0.309**, thr ≈ 0.35) | Point forecasts regress to the mean on rare shocks; probability + upside interval operationalise ALPS/AFSIS alerts |
-| **7. 5-page Streamlit app** | Home, EDA, Preprocessing, Training, Prediction (what-if + bulk CSV) | Turns the pipeline into a usable early-warning tool for analysts |
+| **6. Two-stage risk layer** | Point residual + Quantile **P10–P90** (PICP ≈ **80.3%**) + balanced **Stage-2 classifier** (Precision ≈ **0.255**, F1 ≈ **0.330**, ROC-AUC ≈ **0.628**, thr ≈ 0.50) | Point forecasts regress to the mean on rare shocks; probability + upside interval operationalise ALPS/AFSIS alerts |
+| **7. 5-page Streamlit app** | Home, EDA, Preprocessing, Training, Prediction (what-if + interactive what-if) | Turns the pipeline into a usable early-warning tool for analysts |
 
 ---
 
-## Repository Structure (42 entries)
+## Repository Structure (40 entries)
 
 ```
 .
@@ -59,7 +59,7 @@ FoodShock forecasts monthly staple-food prices across ASEAN markets and issues e
 │   ├── eda.py                         # Interactive filters & trends
 │   ├── preprocessing.py               # Audit transparency & integrity rules
 │   ├── training.py                    # Official tables + live train residual vs direct
-│   └── prediction.py                  # What-if & bulk CSV with P10–P90 and P(Shock)
+│   └── prediction.py                  # What-if & interactive what-if with P10–P90 and P(Shock)
 ├── data/
 │   ├── foodshock_asean_model_ready.csv    # Clean panel 27,950 × 38 (0 NaN/Inf)
 │   ├── fpma_wfp_country_coverage.csv
@@ -77,8 +77,6 @@ FoodShock forecasts monthly staple-food prices across ASEAN markets and issues e
 │   ├── error_by_commodity.png
 │   ├── shap_summary.png
 │   └── shock_residual_dist.png
-└── user_analysis_example/
-    └── contoh_bulk_test.csv           # Sample bulk prediction CSV
 ```
 
 > **Raw data note:** The original WFP/HDX extract (`asean_wfp_2015_2025.csv`, ~98 MB) is **not** shipped (GitHub size limits). The model-ready panel is `data/foodshock_asean_model_ready.csv`. Source: [WFP Food Prices – HDX](https://data.humdata.org/).
@@ -100,11 +98,14 @@ Validation: expanding train → next 12 months at cutoffs 2019-06 … 2024-06. *
 
 **Interpretation:** Monthly food prices are near-martingale; Persistence is strong on MAE. Value-add is shown by **lower RMSE**, positive **skill scores**, **Diebold–Mariano significance** for boosted residual models, **quantile PICP ≈ 80%**, and the Stage-2 classifier.
 
-### Stage-2 Shock Classifier (Walk-Forward OOF)
+### Stage-2 Shock Classifier (Walk-Forward OOF, regularized)
 
 | Precision | Recall | F1 | ROC-AUC | PR-AUC | Base rate | Opt. threshold |
 |-----------|--------|-----|---------|--------|-----------|----------------|
-| 0.213 | **0.564** | **0.309** | 0.605 | 0.228 | 0.162 | 0.35 |
+| **0.255** | 0.464 | **0.330** | **0.628** | **0.250** | 0.162 | **0.50** |
+
+Regularization (`max_depth=4`, `min_child_samples=50`, `reg_lambda=5`, subsample/colsample 0.8) improves Precision, F1, ROC-AUC and PR-AUC versus a deeper unregularized classifier, at a controlled recall trade-off suitable for fewer false alarms.
+
 
 ### Stratified OOS counts (walk-forward)
 
@@ -143,7 +144,7 @@ streamlit run app.py
 2. **EDA** — interactive filters & price trends  
 3. **Preprocessing** — coverage ≥ 60 months proof  
 4. **Model Training** — live Residual vs Direct vs Persistence  
-5. **Prediction & Alert** — what-if + bulk CSV + P10–P90 + P(Shock)  
+5. **Prediction & Alert** — what-if + interactive what-if + P10–P90 + P(Shock)  
 
 ---
 

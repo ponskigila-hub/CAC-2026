@@ -429,8 +429,17 @@ def main():
         X_te = data.loc[te, feat_names]
         y_te = data.loc[te, "shock_label"].values
         clf = lgb.LGBMClassifier(
-            n_estimators=250, max_depth=6, learning_rate=0.05,
-            class_weight="balanced", random_state=RANDOM_STATE, n_jobs=-1, verbose=-1,
+            n_estimators=150,
+            max_depth=4,
+            min_child_samples=50,
+            reg_lambda=5.0,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            learning_rate=0.03,
+            class_weight="balanced",
+            random_state=RANDOM_STATE,
+            n_jobs=-1,
+            verbose=-1,
         )
         clf.fit(X_tr, y_tr)
         proba = clf.predict_proba(X_te)[:, 1]

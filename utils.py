@@ -18,7 +18,7 @@ FEATURE_COLS = [
 
 CAT_COLS = ["countryiso3", "commodity_group", "pricetype"]
 
-SHOCK_PROB_THRESHOLD = 0.35
+SHOCK_PROB_THRESHOLD = 0.50
 SHOCK_PCT_THRESHOLD = 0.05
 
 
