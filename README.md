@@ -43,58 +43,39 @@ Tanggal unduh, lisensi redistribusi snapshot dan tanggal rilis aktual setiap obs
 4. Bentuk training pair origin–target pada horizon 1–36 bulan. Origin training menggunakan bulan kuartal (Maret, Juni, September, Desember), maksimal 6.000 origin terpilih secara deterministik untuk efisiensi. Maksimal 90.000 pasangan digunakan pada tahap fit. Seluruh origin eligible pada cutoff evaluasi digunakan untuk backtest, tanpa sampling test. Data dari seluruh rentang sumber dapat berkontribusi pada persiapan dan pool training; tidak semua baris menjadi training pair.
 5. Bentuk label shock dari harga aktual bulan target dan bulan tepat sebelumnya: `shock = 1` jika `price_target / price_previous - 1 >= 0.05`; jika bulan sebelumnya tidak tercatat, label shock tidak diketahui dan dikeluarkan dari evaluasi klasifikasi.
 
-### 5.2 Multi-horizon price regression
+### 5.2 Direct multi-horizon price regression
 
-Target regresi adalah `log(P_target / P_origin)`. Model menerima fitur origin serta horizon target dan kalender target. Estimasi harga diperoleh dari `P_origin * exp(predicted_log_ratio)`. Training target diclip pada [-3, 3] untuk membatasi efek outlier; output log ratio juga dibatasi [-5, 5] sebagai perlindungan numerik. Dibandingkan Ridge Regression, Histogram Gradient Boosting Regressor, Persistence, dan Seasonal Naive (fallback persistence jika referensi bulan musiman tidak tersedia).
+Target regresi adalah `log(P_target/P_origin)`. Model menerima fitur origin, horizon, serta kalender target. Harga dihitung sebagai `P_origin * exp(predicted_log_ratio)`; target training diclip [-3, 3] dan output [-5, 5]. Kandidat: Ridge (alpha 1/10), tiga konfigurasi Histogram Gradient Boosting (7/15/31 leaves), Persistence, Seasonal Naive (fallback Persistence), dan shrinkage geometris HGB dengan bobot 25%, 50%, 75% pada log ratio. Shrinkage merupakan kombinasi sederhana yang membatasi koreksi harga terhadap baseline, bukan model tambahan yang kompleks.
 
-Pemilihan model ML berdasarkan weighted MAPE validasi (bukan berdasarkan test). Model harga HGB dipilih di antara dua model ML; Persistence tetap baseline terbaik secara agregat pada backtest. Dua algoritma harga tersedia untuk pengguna. Regresi langsung menggunakan horizon sebagai fitur, bukan mengulang satu snapshot klasifikasi dari masa lalu. Prediksi perubahan harga pada target dihitung terhadap estimasi bulan sebelumnya (atau harga aktual origin jika h=1).
+Konfigurasi Ridge/HGB dipilih menurut MAPE validasi gabungan. Mode Automatic memilih kandidat dengan MAPE validasi terbaik per kelompok horizon 1–3, 4–6, 7–12, 13–36. Validasi awal hanya mencapai 24 bulan sehingga kebijakan 13–36 ditentukan dari bukti 13–24. Pengguna dapat memilih model harga tertentu secara eksplisit. Perubahan bulanan dihitung dari dua estimasi berturut-turut pada path; pada mode Automatic perubahan model antar kelompok dapat memengaruhi perubahan estimasi. Shock classifier berdiri sendiri.
 
 ### 5.3 Shock risk classification
 
-Model terpisah mempelajari label kenaikan aktual minimal 5% pada bulan target dari fitur origin dan horizon. Kandidat Logistic Regression dan Histogram Gradient Boosting Classifier dipilih berdasarkan recall pada threshold dengan FPR validasi <=10% (minimal 30 alert jika tersedia). HGB classifier terpilih; threshold 0,4453752072505741 ditetapkan dari prediksi validasi gabungan. Threshold kemudian digunakan pada backtest dan deployment refit tanpa tuning terhadap hasil test. Risk score bukan probabilitas yang dikalibrasi. Klasifikasi shock dan price-implied shock dari perubahan estimasi harga titik dapat berbeda, karena keduanya menjawab pertanyaan statistik yang berbeda. UI menampilkan klasifikasi utama dari classifier dan price-implied shock pada detail.
+Target = kenaikan aktual bulan target terhadap bulan sebelumnya ≥5%. Logistic Regression (C 0.1/1) dan tiga konfigurasi HGB diuji. Ambang berbeda untuk kelompok horizon 1–3, 4–6, 7–12, 13–36: maksimum recall di bawah batas FPR 10% pada validasi, minimal 30 alert apabila feasible; fallback tanpa alert bila tidak feasible. Model dipilih berdasarkan recall agregat pada kebijakan tersebut. Hasil test tidak digunakan untuk pemilihan konfigurasi, model harga atau threshold evaluasi retrospektif. Risk score bukan probabilitas terkalibrasi; FPR masa depan tidak dijamin. False alarm di antara alert = 1 − precision, berbeda dari FPR.
 
-### 5.4 Temporal evaluation
+### 5.4 Rolling-origin evaluation
 
-| Tahap | Cutoff label training / origin | Target evaluasi |
+| Tahap | Cutoff label training / origin | Target maksimum |
 |---|---|---|
-| Validation A | Desember 2020 | Januari 2021–Desember 2022 |
-| Validation B | Desember 2021 | Januari–Desember 2022 |
-| Retrospective test | Desember 2022 | Januari 2023–Desember 2025 |
-| Deployment refit | Desember 2025 | Januari 2026 dan setelahnya |
+| Validation | Des 2020, Jun 2021, Des 2021, Jun 2022 | Des 2022 |
+| Retrospective test | Des 2022, Jun 2023, Des 2023, Jun 2024 | Des 2025 |
+| Deployment refit | Des 2025 | Prediksi setelah origin |
 
-Data target training wajib tidak melampaui cutoff. Pooled validation menghitung forecast dari origin berbeda sebagai kasus berbeda walaupun beberapa bulan target berulang. Model selection dan threshold menggunakan validasi 1–24 bulan. Backtest mencakup 1–36 bulan, dengan jumlah observasi yang tidak sama pada setiap horizon akibat cakupan data. Periode 2023–2025 telah digunakan dalam eksperimen proyek sebelumnya, sehingga hasil ini merupakan **evaluasi retrospektif**, bukan klaim test set baru yang sepenuhnya untouched.
+Label training tidak boleh melewati cutoff. Pada setiap origin, model dilatih hanya dengan label yang tersedia hingga cutoff. Prediksi dari beberapa origin dapat memiliki bulan target sama, sehingga n adalah jumlah pasangan origin–target, bukan jumlah kejadian independen. Evaluasi ini retrospektif: data 2023–2025 sudah pernah dilihat dalam eksperimen versi sebelumnya. Origin Juni/Desember menambah cakupan dibanding hanya Desember, tetapi belum mewakili seluruh musim. Semua horizon 1–36 diuji secara gabungan, meskipun horizon panjang hanya berasal dari origin lebih awal.
 
-### 5.5 Ketidakpastian dan horizon panjang
+Tuning: 5 konfigurasi regresi dan 5 klasifikasi, masing-masing pada 4 origin validasi. Feature ablation HGB standard: momentum+horizon (8), +volatilitas/tren (12), full (17). Sensitivitas cap pasangan training 30.000 vs 90.000 di origin Jun 2022. Permutation importance classifier pada sampel validasi terakhir (AP; 3 pengulangan). Analisis per provinsi dan komoditas tersedia. Tidak mengklaim seluruh fitur meningkatkan performa regresi.
 
-Rentang empiris berbasis kuantil ke-10 dan ke-90 log residual validasi ditampilkan sebagai rentang error historis, **bukan jaminan confidence/prediction interval formal**. Untuk horizon 25–36, rentang 13–24 digunakan sebagai pendekatan dan coverage historis dilaporkan terpisah. Untuk target lebih dari 36 bulan, aplikasi melanjutkan seasonal pattern dari tahun terakhir hasil forecast dengan tren teredam. Ini merupakan ekstrapolasi yang belum divalidasi; risk score ML dan rentang empiris tidak ditampilkan. Sinyal shock pada horizon tersebut hanya dihitung dari perubahan estimasi harga. Batas tahun UI 2026–2100. Semua tanggal dalam satu bulan menghasilkan prediksi bulanan yang sama.
+### 5.5 Deployment dan ketidakpastian
+
+Setelah evaluasi selesai, model dilatih ulang dengan pool label sampai Des 2025. Threshold deployment dan kuantil log error 10–90% diperbarui menggunakan prediksi out-of-fold historis validasi + backtest sampai 2025. Ini memperluas bukti untuk horizon 25–36, tetapi masih merupakan transfer dari model historis ke model refit, bukan kalibrasi independen terhadap artifact deployment. Tidak ada test setelah 2025. Metrik retrospektif tetap memakai threshold validasi awal, bukan threshold baru. Rentang empiris bukan jaminan interval prediksi formal. Di atas 36 bulan, aplikasi memakai ekstrapolasi musiman dengan tren teredam, tanpa risk score ML dan tanpa rentang empiris. Tahun target 2026–2100; semua tanggal di bulan sama memberi hasil yang sama.
 
 ## 6. Hasil evaluasi
 
-Hasil training aktual (lihat `results/forecast_metrics.csv`, `results/shock_metrics.csv`, `results/interval_coverage.csv`).
+Hasil rolling backtest aktual: 224.336 pasangan harga dan 217.627 pasangan dengan label shock. Fixed HGB blend 25% mencapai MAPE 12,28% vs Persistence 12,63%; Automatic yang dipilih dari validasi mencapai 13,68% dan belum mengalahkan Persistence. HGB shock classifier: AP 0,3191, ROC-AUC 0,7012, precision 38,33%, recall 22,22%, FPR 7,64%. FPR horizon 1–3 bulan masih 12,62%. Pada origin Desember 2022 yang identik dengan versi sebelumnya, FPR meningkat dari 8,51% menjadi 10,26% sambil recall meningkat dari 25,24% menjadi 28,58%. Oleh karena itu, tidak ada klaim bahwa false alarm turun pada perbandingan yang setara.
 
-### Price forecasting (MAPE %, lebih rendah lebih baik)
+Contoh aktual: Pasar Mundu, beras medium, Januari 2028, Automatic: Rp15.528/kg, perubahan +0,11%, risk score 0,0602, Non-Shock, rentang empiris Rp13.702–21.342/kg. Bukan harga aktual.
 
-| Model | Semua horizon | 1 bulan | 12 bulan | 24 bulan | 36 bulan |
-|---|---:|---:|---:|---:|---:|
-| Persistence | 13,86 | 5,82 | 16,91 | 15,47 | 16,42 |
-| Seasonal Naive | 17,96 | 13,88 | 16,91 | 15,47 | 16,42 |
-| Ridge | 20,06 | 11,04 | 15,03 | 15,07 | 14,07 |
-| HGB | 16,86 | 5,88 | 14,17 | 13,49 | 12,91 |
-
-104.875 target harga diketahui pada backtest. MAPE adalah mean absolute percentage error; RMSLE dalam CSV didefinisikan sebagai akar rata-rata kuadrat log rasio prediksi terhadap aktual. HGB lebih baik dari Persistence pada horizon 12, 24 dan 36 bulan, tetapi bukan secara agregat. Tidak ada klaim ML selalu mengalahkan baseline. Perbedaan error juga dipengaruhi coverage dan komposisi komoditas antarhorizon.
-
-### Shock classification (102.621 label tersedia)
-
-| Model | AP | ROC-AUC | Precision | Recall | F1 | FPR |
-|---|---:|---:|---:|---:|---:|---:|
-| Logistic Regression | 0,3114 | 0,6808 | 38,46% | 33,56% | 35,84% | 12,36% |
-| HGB | 0,3250 | 0,6932 | 40,57% | 25,24% | 31,12% | 8,51% |
-
-Prevalence shock test 18,70%; random/uninformative ranking memiliki expected AP mendekati prevalence. HGB memilih 11.943 alert pada label yang tersedia: TP 4.845, FP 7.098, FN 14.350, TN 76.328. HGB terpilih karena lebih baik pada sasaran recall dengan batas FPR **validasi**, bukan karena F1 test. Precision 73,995% pada horizon 1 bulan, 45,42% pada 24 bulan, 48,42% pada 36 bulan; jumlah sampel berbeda. FPR test tidak selalu di bawah 10% untuk setiap horizon. Risiko false alarm dan missed shock tetap ada.
-
-### Contoh prediksi aktual dari frozen deployment model
-
-Pasar Mundu, Jawa Barat, Rice (medium quality), KG. Harga tercatat Desember 2025 Rp15.000/kg. Target 31 Januari 2028 = horizon 25 bulan. HGB menghasilkan estimasi Desember 2027 Rp17.116/kg dan Januari 2028 Rp17.184/kg, perubahan +0,40%, risk score 0,061, klasifikasi non-shock. Rentang galat empiris Rp11.977–Rp22.595/kg (menggunakan pendekatan horizon 13–24). Ini adalah output model, bukan harga aktual masa depan.
+Lihat `docs/RESULTS.md` untuk tabel hasil dan interpretasi serta `results/` untuk CSV lengkap.
 
 ## 7. Inovasi dan dampak
 
@@ -140,7 +121,7 @@ python -m pip install -r requirements.txt
 python -m jupyter lab
 ```
 
-Buka `notebooks/FoodShock_Indonesia.ipynb`, pilih kernel dari `cac2026-venv`, lalu **Run All**. Notebook mengikuti lima tahap yang sama dengan Streamlit: Overview, EDA, Preprocessing, Training & Testing, Prediction. `REBUILD=False` memakai artifact dan hasil eksperimen yang disediakan; `REBUILD=True` menjalankan ulang `src.train` dari raw regional. Konfigurasi prediction default: `TARGET_DATE='2028-01-31'`, `SERIES_ID=868`, `ALGORITHM=None` (model ML terpilih).
+Buka `notebooks/FoodShock_Indonesia.ipynb`, pilih kernel dari `cac2026-venv`, lalu **Run All**. Notebook mengikuti lima tahap yang sama dengan Streamlit: Overview, EDA, Preprocessing, Training & Testing, Prediction. `REBUILD=False` memakai artifact dan hasil eksperimen yang disediakan; `REBUILD=True` menjalankan ulang `src.train` dari raw regional. Konfigurasi prediction default: `TARGET_DATE='2028-01-31'`, `SERIES_ID=868`, `ALGORITHM=None` (mode Automatic (by horizon)).
 
 ## 11. Streamlit
 
@@ -166,15 +147,15 @@ python -m src.extract "C:\path\to\raw_csvs"
 python -m src.train
 ```
 
-Notebook dan aplikasi menggunakan `src.forecast` dan model/CSV hasil yang sama. Hasil backtest menggunakan model cutoff 2022; frozen deployment model menggunakan data sampai 2025. Hasil keduanya tidak dicampur.
+Notebook dan aplikasi menggunakan `src.forecast` dan model/CSV hasil yang sama. Hasil backtest menggunakan empat model cutoff 2022–2024; frozen deployment model menggunakan data sampai 2025. Hasil keduanya tidak dicampur.
 
 ## 13. Keterbatasan
 
 - Forecast masa depan bukan harga aktual dan tidak memasukkan kejadian setelah data 2025 (cuaca, kebijakan, supply shock, inflasi baru). Ketidakpastian meningkat dan tidak selalu monoton pada estimasi rentang empiris.
 - Hanya sampai 36 bulan telah dievaluasi; horizon lebih panjang adalah ekstrapolasi. Prediksi 2028 layak dihitung dalam horizon ML jika origin masih pada 2025, namun performa masa depan tidak dijamin.
-- Data Indonesia dan kualitas riwayat tidak seragam antarwilayah/produk. Data sumber tidak mencakup seluruh pasar Indonesia. Origin evaluasi dibatasi pada Desember, sedangkan training mencakup bulan kuartal; generalisasi untuk origin lain belum diuji menyeluruh.
-- Persistence unggul dalam error agregat. Shock classifier memiliki recall terbatas, sehingga non-shock tidak berarti harga pasti aman.
-- Threshold dipindahkan ke model refit deployment dan belum divalidasi pada outcome masa depan; FPR dapat berubah.
+- Data Indonesia dan kualitas riwayat tidak seragam antarwilayah/produk. Data sumber tidak mencakup seluruh pasar Indonesia. Origin evaluasi mencakup Juni dan Desember, sedangkan training mencakup bulan kuartal; generalisasi untuk origin lain belum diuji menyeluruh.
+- Model ML belum tentu mengungguli Persistence. Shock classifier memiliki recall terbatas, sehingga non-shock tidak berarti harga pasti aman.
+- Threshold deployment diadaptasi dari prediksi OOF hingga 2025 dan belum divalidasi pada outcome masa depan; FPR dapat berubah.
 - Tidak ada validasi dengan pengguna nyata, audit dampak intervensi, atau jaminan redistribusi data.
 - Streamlit browser end-to-end belum diuji dalam environment pengembangan; jalankan smoke test lokal sebelum submission.
 
