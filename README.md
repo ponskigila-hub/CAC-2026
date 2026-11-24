@@ -1,108 +1,190 @@
-# FoodShock V9
-**Cross-Country ASEAN Food Price Forecasting & Early Shock Detection**  
-Machine Learning Solution Challenge 2026 · Cyan Academic Competition · Preliminary round  
-SDG 2 (Zero Hunger), target 2.c: market information and extreme food-price volatility
+# FoodShock Indonesia
 
-## 1. Problem and intended use
+**Multi-Horizon Food Price & Shock Forecasting** · Machine Learning Solution Challenge 2026 · SDG 2: Zero Hunger (target 2.c)
 
-A sudden increase in staple-food prices can reduce household purchasing power and complicate market-stabilization decisions. FoodShock is a historical market-screening prototype for food-price monitoring teams, such as national food agencies and regional information coordinators. It forecasts a market/commodity's next monthly USD price and prioritizes possible upward price shocks for investigation. It is not a live food-security alert service, a causal food-insecurity model, or a substitute for local-price and affordability analysis.
+## 1. Latar belakang
 
-A shock is a next-month price increase strictly greater than 5%, with a 1e-12 numerical tolerance to prevent floating-point misclassification at equality. This is FoodShock's empirical upper-tail rule: the supplied panel's P90 monthly return is about +4.44%, and P95 is +7.20%. The full-panel quantiles are descriptive, not a claim that the threshold was optimized prospectively. The +5% definition is fixed throughout evaluation; it is not the official WFP ALPS formula. Intended action: normal = routine monitoring, elevated = review, alert = prioritize independent investigation. The warning tier is illustrative; binary metrics evaluate the alert tier only.
+Lonjakan harga pangan mengurangi keterjangkauan pangan bagi rumah tangga, khususnya kelompok dengan anggaran terbatas. Pemantauan harga yang tepat waktu dapat membantu analis ketahanan pangan mengidentifikasi pasar dan komoditas yang memerlukan perhatian. FoodShock menggunakan riwayat harga retail Indonesia untuk menghasilkan estimasi harga dan risiko lonjakan pada bulan target. Solusi ini mendukung tujuan SDG 2.c mengenai informasi pasar pangan dan volatilitas harga pangan ekstrem.
 
-## 2. Submission quick start
+## 2. Perumusan masalah
 
-The ZIP includes the dataset, canonical source, executed notebook, actual V9 evaluation tables and figures, eight frozen CatBoost/quantile/classifier bundles, and integration tests. No network or raw download is required for benchmark reproduction after installing dependencies.
+1. Bagaimana memanfaatkan riwayat harga pangan Indonesia 2015–2025 untuk memprediksi harga komoditas pada berbagai horizon waktu?
+2. Bagaimana memperkirakan risiko kenaikan harga minimal 5% dibandingkan bulan sebelum target, tanpa menggunakan harga aktual yang belum diketahui?
+3. Bagaimana mengukur kemampuan model dibandingkan baseline sederhana dan mengendalikan false alarm melalui pemilihan threshold berbasis validasi?
 
-```bash
-# From the extracted project directory (Python 3.13.5 was used to build the artifacts)
+## 3. Tujuan dan manfaat
+
+- Memprediksi **harga pangan pada bulan target** pilihan pengguna, serta estimasi persentase perubahan dibandingkan bulan sebelumnya.
+- Menghasilkan **risk score dan klasifikasi shock/non-shock** untuk horizon yang telah dievaluasi.
+- Membandingkan performa berbagai horizon secara temporal, bukan menggunakan random train/test split.
+- Memberikan informasi pendukung kepada analis pasar, bukan keputusan otomatis untuk intervensi harga.
+
+Pengguna cukup memilih tanggal target, provinsi, produk, pasar/satuan dan model harga. Tidak perlu mengisi harga acuan atau fitur manual. Contoh: tanggal target 31 Januari 2028 menggunakan model yang dipelajari dari data 2015–2025 untuk menghasilkan estimasi Januari 2028 dan Desember 2027. Harga aktual terakhir tetap menjadi titik awal matematis untuk menyatakan perubahan relatif, **bukan satu-satunya data yang digunakan untuk melatih model**.
+
+## 4. Dataset dan ruang lingkup
+
+Sumber: [Global Food Prices Database (WFP), Kaggle](https://www.kaggle.com/datasets/abhishekgupta56447/global-food-prices-database-wfp), uploader `abhishekgupta56447`, penyedia asli World Food Programme. Sebelas CSV tahunan 2015–2025 yang diberikan pengguna menghasilkan 327.163 baris Indonesia. File regional terkompresi tersedia di `data/raw/indonesia.csv.gz`; checksum SHA-256 seluruh sumber asli dan jumlah baris terdapat pada `source_manifest.csv`. Kesebelas checksum asli berhasil diverifikasi terhadap file sumber.
+
+- 327.163 observasi bulanan setelah penyaringan/agregasi; 223 ID pasar, 29 ID komoditas dan 5.673 series market–product–unit–currency.
+- 287.879 origin dengan minimal empat bulan observasi berurutan; 5.652 series yang memiliki origin layak.
+- 1.720 series memiliki origin terakhir yang layak pada 2025 (1.710 pada Desember). Prediction membatasi pilihan pada series tersebut agar data awal tidak terlalu usang. EDA menampilkan cakupan historis yang lebih luas.
+- Data tahunan tidak seimbang; 2015, 2018 dan 2019 sangat jarang dibandingkan 2020–2023. Tidak ada pengisian harga hilang untuk menciptakan riwayat buatan.
+- Harga lokal IDR; unit dan kualitas produk tidak digabung secara sembarangan. Harga sumber berlabel actual maupun aggregate dipertahankan sebagai harga retail yang tercatat, bukan dianggap semuanya merupakan transaksi individual.
+
+Tanggal unduh, lisensi redistribusi snapshot dan tanggal rilis aktual setiap observasi belum dikonfirmasi. Pastikan izin redistribusi sebelum pengumpulan eksternal. Data bulanan diperlakukan seolah tersedia setelah bulan selesai; publication lag tidak dimodelkan.
+
+## 5. Metodologi
+
+### 5.1 Data preparation dan feature engineering
+
+1. Filter IDN, IDR, retail, pangan, harga positif dan finite.
+2. Agregasi median per market ID, commodity ID, unit, currency dan bulan. Pertahankan identitas produk/pasar.
+3. Hitung log momentum pada lag 1, 3, 6 dan 12 bulan, volatilitas tiga bulan, tren bulanan, jumlah riwayat, fitur kalender origin/target, horizon, interaksi horizon dengan tren, serta indikator missing lag. Lag harus berjarak tepat sesuai kalender; minimal empat observasi bulanan berurutan diperlukan. Fitur lag opsional yang hilang diisi nol disertai indikator missing. Tidak mengimputasi harga aktual.
+4. Bentuk training pair origin–target pada horizon 1–36 bulan. Origin training menggunakan bulan kuartal (Maret, Juni, September, Desember), maksimal 6.000 origin terpilih secara deterministik untuk efisiensi. Maksimal 90.000 pasangan digunakan pada tahap fit. Seluruh origin eligible pada cutoff evaluasi digunakan untuk backtest, tanpa sampling test. Data dari seluruh rentang sumber dapat berkontribusi pada persiapan dan pool training; tidak semua baris menjadi training pair.
+5. Bentuk label shock dari harga aktual bulan target dan bulan tepat sebelumnya: `shock = 1` jika `price_target / price_previous - 1 >= 0.05`; jika bulan sebelumnya tidak tercatat, label shock tidak diketahui dan dikeluarkan dari evaluasi klasifikasi.
+
+### 5.2 Multi-horizon price regression
+
+Target regresi adalah `log(P_target / P_origin)`. Model menerima fitur origin serta horizon target dan kalender target. Estimasi harga diperoleh dari `P_origin * exp(predicted_log_ratio)`. Training target diclip pada [-3, 3] untuk membatasi efek outlier; output log ratio juga dibatasi [-5, 5] sebagai perlindungan numerik. Dibandingkan Ridge Regression, Histogram Gradient Boosting Regressor, Persistence, dan Seasonal Naive (fallback persistence jika referensi bulan musiman tidak tersedia).
+
+Pemilihan model ML berdasarkan weighted MAPE validasi (bukan berdasarkan test). Model harga HGB dipilih di antara dua model ML; Persistence tetap baseline terbaik secara agregat pada backtest. Dua algoritma harga tersedia untuk pengguna. Regresi langsung menggunakan horizon sebagai fitur, bukan mengulang satu snapshot klasifikasi dari masa lalu. Prediksi perubahan harga pada target dihitung terhadap estimasi bulan sebelumnya (atau harga aktual origin jika h=1).
+
+### 5.3 Shock risk classification
+
+Model terpisah mempelajari label kenaikan aktual minimal 5% pada bulan target dari fitur origin dan horizon. Kandidat Logistic Regression dan Histogram Gradient Boosting Classifier dipilih berdasarkan recall pada threshold dengan FPR validasi <=10% (minimal 30 alert jika tersedia). HGB classifier terpilih; threshold 0,4453752072505741 ditetapkan dari prediksi validasi gabungan. Threshold kemudian digunakan pada backtest dan deployment refit tanpa tuning terhadap hasil test. Risk score bukan probabilitas yang dikalibrasi. Klasifikasi shock dan price-implied shock dari perubahan estimasi harga titik dapat berbeda, karena keduanya menjawab pertanyaan statistik yang berbeda. UI menampilkan klasifikasi utama dari classifier dan price-implied shock pada detail.
+
+### 5.4 Temporal evaluation
+
+| Tahap | Cutoff label training / origin | Target evaluasi |
+|---|---|---|
+| Validation A | Desember 2020 | Januari 2021–Desember 2022 |
+| Validation B | Desember 2021 | Januari–Desember 2022 |
+| Retrospective test | Desember 2022 | Januari 2023–Desember 2025 |
+| Deployment refit | Desember 2025 | Januari 2026 dan setelahnya |
+
+Data target training wajib tidak melampaui cutoff. Pooled validation menghitung forecast dari origin berbeda sebagai kasus berbeda walaupun beberapa bulan target berulang. Model selection dan threshold menggunakan validasi 1–24 bulan. Backtest mencakup 1–36 bulan, dengan jumlah observasi yang tidak sama pada setiap horizon akibat cakupan data. Periode 2023–2025 telah digunakan dalam eksperimen proyek sebelumnya, sehingga hasil ini merupakan **evaluasi retrospektif**, bukan klaim test set baru yang sepenuhnya untouched.
+
+### 5.5 Ketidakpastian dan horizon panjang
+
+Rentang empiris berbasis kuantil ke-10 dan ke-90 log residual validasi ditampilkan sebagai rentang error historis, **bukan jaminan confidence/prediction interval formal**. Untuk horizon 25–36, rentang 13–24 digunakan sebagai pendekatan dan coverage historis dilaporkan terpisah. Untuk target lebih dari 36 bulan, aplikasi melanjutkan seasonal pattern dari tahun terakhir hasil forecast dengan tren teredam. Ini merupakan ekstrapolasi yang belum divalidasi; risk score ML dan rentang empiris tidak ditampilkan. Sinyal shock pada horizon tersebut hanya dihitung dari perubahan estimasi harga. Batas tahun UI 2026–2100. Semua tanggal dalam satu bulan menghasilkan prediksi bulanan yang sama.
+
+## 6. Hasil evaluasi
+
+Hasil training aktual (lihat `results/forecast_metrics.csv`, `results/shock_metrics.csv`, `results/interval_coverage.csv`).
+
+### Price forecasting (MAPE %, lebih rendah lebih baik)
+
+| Model | Semua horizon | 1 bulan | 12 bulan | 24 bulan | 36 bulan |
+|---|---:|---:|---:|---:|---:|
+| Persistence | 13,86 | 5,82 | 16,91 | 15,47 | 16,42 |
+| Seasonal Naive | 17,96 | 13,88 | 16,91 | 15,47 | 16,42 |
+| Ridge | 20,06 | 11,04 | 15,03 | 15,07 | 14,07 |
+| HGB | 16,86 | 5,88 | 14,17 | 13,49 | 12,91 |
+
+104.875 target harga diketahui pada backtest. MAPE adalah mean absolute percentage error; RMSLE dalam CSV didefinisikan sebagai akar rata-rata kuadrat log rasio prediksi terhadap aktual. HGB lebih baik dari Persistence pada horizon 12, 24 dan 36 bulan, tetapi bukan secara agregat. Tidak ada klaim ML selalu mengalahkan baseline. Perbedaan error juga dipengaruhi coverage dan komposisi komoditas antarhorizon.
+
+### Shock classification (102.621 label tersedia)
+
+| Model | AP | ROC-AUC | Precision | Recall | F1 | FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0,3114 | 0,6808 | 38,46% | 33,56% | 35,84% | 12,36% |
+| HGB | 0,3250 | 0,6932 | 40,57% | 25,24% | 31,12% | 8,51% |
+
+Prevalence shock test 18,70%; random/uninformative ranking memiliki expected AP mendekati prevalence. HGB memilih 11.943 alert pada label yang tersedia: TP 4.845, FP 7.098, FN 14.350, TN 76.328. HGB terpilih karena lebih baik pada sasaran recall dengan batas FPR **validasi**, bukan karena F1 test. Precision 73,995% pada horizon 1 bulan, 45,42% pada 24 bulan, 48,42% pada 36 bulan; jumlah sampel berbeda. FPR test tidak selalu di bawah 10% untuk setiap horizon. Risiko false alarm dan missed shock tetap ada.
+
+### Contoh prediksi aktual dari frozen deployment model
+
+Pasar Mundu, Jawa Barat, Rice (medium quality), KG. Harga tercatat Desember 2025 Rp15.000/kg. Target 31 Januari 2028 = horizon 25 bulan. HGB menghasilkan estimasi Desember 2027 Rp17.116/kg dan Januari 2028 Rp17.184/kg, perubahan +0,40%, risk score 0,061, klasifikasi non-shock. Rentang galat empiris Rp11.977–Rp22.595/kg (menggunakan pendekatan horizon 13–24). Ini adalah output model, bukan harga aktual masa depan.
+
+## 7. Inovasi dan dampak
+
+Satu antarmuka memungkinkan pengguna memilih tanggal target tanpa memasukkan data masa depan, membandingkan model harga, serta membaca risiko kenaikan harga dan keterbatasan horizon. Model shock memisahkan risiko kejadian ekstrem dari prediksi rata-rata harga. Output dapat menjadi bahan prioritisasi pemeriksaan oleh analis, bukan bukti manfaat intervensi atau validasi deployment nyata. Pengujian meliputi evaluasi temporal dan kontrol false alarm berbasis validation, bukan sekadar peningkatan kompleksitas model.
+
+## 8. Struktur proyek
+
+```text
+FoodShock_Forecasting/
+├── .streamlit/config.toml
+├── data/
+│   ├── raw/                  # Indonesia CSV + checksum manifest
+│   └── processed/            # monthly.csv.gz
+├── docs/                     # Methodology, results, rubric, validation
+├── models/forecast.joblib    # deployment regression + risk classifier
+├── notebooks/FoodShock_Indonesia.ipynb
+├── results/                  # benchmark, interval, split audit, test predictions, example
+├── src/
+│   ├── extract.py            # ekstraksi raw global 2015–2025
+│   ├── forecast.py           # shared preprocessing and inference
+│   └── train.py              # training/validation/test/refit
+├── tests/test_forecast.py
+├── app.py
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
+
+## 9. Instalasi
+
+Gunakan Python 3.11 atau 3.12. Buka PowerShell di root folder proyek. Jika sudah memiliki virtual environment yang sesuai, aktifkan saja.
+
+```powershell
 python -m venv cac2026-venv
-# Windows PowerShell: cac2026-venv\Scripts\Activate.ps1
-# macOS/Linux: source cac2026-venv/bin/activate
+.\cac2026-venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
+```
+
+## 10. Jupyter Notebook
+
+```powershell
+python -m jupyter lab
+```
+
+Buka `notebooks/FoodShock_Indonesia.ipynb`, pilih kernel dari `cac2026-venv`, lalu **Run All**. Notebook mengikuti lima tahap yang sama dengan Streamlit: Overview, EDA, Preprocessing, Training & Testing, Prediction. `REBUILD=False` memakai artifact dan hasil eksperimen yang disediakan; `REBUILD=True` menjalankan ulang `src.train` dari raw regional. Konfigurasi prediction default: `TARGET_DATE='2028-01-31'`, `SERIES_ID=868`, `ALGORITHM=None` (model ML terpilih).
+
+## 11. Streamlit
+
+```powershell
 python -m streamlit run app.py
 ```
 
-The official benchmark is already generated; rerunning it is optional. To reproduce everything using the canonical panel:
+Buka http://localhost:8501. Pilih Prediction atau tombol Mulai prediksi. Ketik tahun target, pilih bulan/tanggal, provinsi, komoditas, pasar/satuan, dan model harga. Klik Prediksi sekarang. Tidak perlu training ulang untuk demo. Training & Testing menyediakan eksperimen backtest opsional yang tidak menimpa model deployment. Untuk rebuild resmi melalui notebook/CLI, restart Streamlit setelah selesai supaya cache model diperbarui.
 
-```bash
-python src/run_v9.py --trials 25
-python src/build_report.py
+## 12. Reproduksi penelitian melalui CLI
+
+Dari root proyek, untuk mengulang training dan preprocessing dari data regional yang sudah tersedia:
+
+```powershell
+python -m src.train
 python -m unittest discover -s tests -v
 ```
 
-Use the exact dependency versions in `requirements.txt` for artifact compatibility. The tested Python/library versions and file hashes are in `data/v9_manifest.json`. Restart Streamlit after regenerating artifacts. The optional fast `--trials 1` is for smoke experimentation only and overwrites results if run in the submission directory; use a copy of the project. The packaged benchmark and notebook were produced with 25 trials, not the smoke configuration. Never load pickle/joblib artifacts obtained from an untrusted source.
+Untuk mengekstrak ulang dari 11 CSV global asli, letakkan semua file `wfp_food_prices_global_2015.csv` sampai `wfp_food_prices_global_2025.csv` dalam satu folder. Jalankan sebelum training:
 
-## 3. Data and feature engineering
+```powershell
+python -m src.extract "C:\path\to\raw_csvs"
+python -m src.train
+```
 
-The packaged model-ready dataset contains 27,950 rows and 39 columns from February 2016–November 2025, 582 market series, seven countries (Indonesia, Cambodia, Laos, Philippines, Myanmar, Thailand, Timor-Leste), and five staple commodity groups (rice, chicken, beef, pork, cooking oil). Prices are USD per KG (rice/meat) or per L (oil). Retail and wholesale are separate. Monthly series were retained with at least 60 months of source coverage and reindexed to a monthly calendar without forward-filling raw prices. The original raw WFP snapshot downloaded from [Kaggle](https://www.kaggle.com/datasets/abhishekgupta56447/global-food-prices-database-wfp) is not bundled; see [DATA_SOURCES.md](docs/DATA_SOURCES.md) for attribution, reproducible model-ready path, optional raw rebuild, and unresolved provenance details.
+Notebook dan aplikasi menggunakan `src.forecast` dan model/CSV hasil yang sama. Hasil backtest menggunakan model cutoff 2022; frozen deployment model menggunakan data sampai 2025. Hasil keduanya tidak dicampur.
 
-The preprocessing ensures `country_vs_asean_mom` equals `pct_change_1m − asean_comm_mom_1m`. Observed prices and supplied shock labels are preserved (numeric values checked within floating-point tolerance). No synthetic rows are added to competition training or testing. The integration tests use one synthetic fixture solely to test optional raw preprocessing.
+## 13. Keterbatasan
 
-The 23 numeric features and three train-fitted categorical encodings are declared in `core/utils.py`. Target columns are never in the feature list. At origin t, the observed USD price is available, and lag/rolling/momentum features use t−1 or earlier; FX proxies are inherited from country-month WFP local/USD price ratios and assumed observable at t. ASEAN momentum is lagged in the supplied panel. The monthly rolling statistics, seasonal encoding, and scenario feature formulas share `core/features.py`. Raw rebuild uses the same formulas and computes regional momentum before target filtering with calendar joins.
+- Forecast masa depan bukan harga aktual dan tidak memasukkan kejadian setelah data 2025 (cuaca, kebijakan, supply shock, inflasi baru). Ketidakpastian meningkat dan tidak selalu monoton pada estimasi rentang empiris.
+- Hanya sampai 36 bulan telah dievaluasi; horizon lebih panjang adalah ekstrapolasi. Prediksi 2028 layak dihitung dalam horizon ML jika origin masih pada 2025, namun performa masa depan tidak dijamin.
+- Data Indonesia dan kualitas riwayat tidak seragam antarwilayah/produk. Data sumber tidak mencakup seluruh pasar Indonesia. Origin evaluasi dibatasi pada Desember, sedangkan training mencakup bulan kuartal; generalisasi untuk origin lain belum diuji menyeluruh.
+- Persistence unggul dalam error agregat. Shock classifier memiliki recall terbatas, sehingga non-shock tidak berarti harga pasti aman.
+- Threshold dipindahkan ke model refit deployment dan belum divalidasi pada outcome masa depan; FPR dapat berubah.
+- Tidak ada validasi dengan pengguna nyata, audit dampak intervensi, atau jaminan redistribusi data.
+- Streamlit browser end-to-end belum diuji dalam environment pengembangan; jalankan smoke test lokal sebelum submission.
 
-Important limitation: the supplied panel was retrospectively selected based on series length and has only labeled rows; raw availability/reporting delays and FX construction cannot be independently audited without the original extract. This evaluation therefore controls model/label temporal leakage but is not a guarantee of fully prospective data collection or real-time feature availability. Philippines accounts for ~58% of observations; Thailand/Myanmar have sparse OOS coverage. Report micro, macro and subgroup results rather than treating countries equally represented.
+## 14. Referensi
 
-## 4. Shared V9 methodology
+- United Nations, SDG 2: https://sdgs.un.org/goals/goal2 (khususnya target 2.c).
+- World Food Programme, Global Food Prices Database, snapshot yang diberikan pengguna: https://www.kaggle.com/datasets/abhishekgupta56447/global-food-prices-database-wfp
+- Scikit-learn, HistGradientBoostingRegressor: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+- Scikit-learn, HistGradientBoostingClassifier: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html
+- Scikit-learn, Ridge: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+- Scikit-learn, LogisticRegression: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
 
-### Temporal evaluation
-
-Seven expanding forecast-origin test windows start in June 2019, 2020, 2021, 2022, 2023, 2024, and 2025. Each covers 12 months or the remaining available data (last window ends November 2025). Outer training observations must have `origin + 1 calendar month < test cutoff`. The final ~20% of outer-training months form a calibration block, with the same strict target-date purge between fit and calibration. Tuning uses a further purged chronological validation split within the fit block only. Encoders fit on training data only; unseen categories map to −1 and remain in OOS evaluation. No row-wise random fallback is permitted.
-
-### Stage 1 — residual forecast
-
-`delta = price(t+1) − price(t)` and `predicted_price = max(0, price(t) + predicted_delta)`.
-
-Compare CatBoost, LightGBM, XGBoost, HistGradientBoosting and Random Forest with the persistence forecast `price(t)`. CatBoost/LightGBM/XGBoost each receive 25 Optuna TPE trials per fold (seed 42): 525 trials across seven folds, plus 25 for the frozen 18-month holdout model. HistGradientBoosting and Random Forest use documented fixed parameters. All algorithms have the same fit/calibration/test boundaries. The point model is fitted on the fit block and **not refitted after calibration**. CatBoost is the pre-specified system architecture, not relabeled as the best overall model if persistence wins.
-
-### Interval layer
-
-Two LightGBM quantile residual regressors (alpha .1 and .9) are fitted on the same fit block, then frozen. The calibration score is `max(lower−actual, actual−upper)` on residuals. The 80% finite-sample order statistic, floored at zero, expands the ordered quantile bounds; prices are clipped at zero. Calibration and inference use the same model and encoder. Report empirical prediction interval coverage (PICP) and mean width. Panel/time dependence violates the simple IID exchangeability assumption; there is no unconditional coverage guarantee. Direct-mode custom models have no validated interval and the app displays none.
-
-### Stage 2 — upward shock screening
-
-A regularized, balanced LightGBM classifier produces a **risk score**, not a calibrated event probability. The deployed binary hybrid decision is `score >= fold_threshold OR predicted_change > 0.05` (with the numerical tolerance above). Both the point model and classifier remain frozen during threshold selection on calibration data. The threshold grid is .05–.95; maximize recall subject to calibration precision >=20%, otherwise maximize F0.5. The precision constraint is a validation objective, not a promise on OOS. The warning tier is separate. The app reads the exact saved model-specific threshold, never the mean threshold across folds.
-
-Compare hybrid decision, score-only, forecast-only, lagged momentum, validation-thresholded historical group risk, and logistic regression. Report precision, recall, F1, FPR, FDR, lift, confusion matrix counts, alerts/month, and month-resampling CIs. PR-AUC and ROC-AUC are attached only to continuous ranking scores; they are not assigned to the hybrid binary rule. For custom holdout metrics, `PR_AUC`/`ROC_AUC` refer to Stage-2 score ranking.
-
-### Evaluation and interpretation
-
-Report MAE, RMSE, sMAPE, price R², residual R², equal-country macro MAE, skill versus persistence, month-level HAC Diebold–Mariano statistic/p-value and whole-month bootstrap skill intervals. DM uses equally weighted month losses; pooled RMSE weights each market row, so their directions can differ. Month bootstrap preserves within-month panel dependence but does not model serial dependence between resampled months. Ablation uses identical fold splits and each fold's full-model CatBoost parameters while adding feature groups (lag/current, rolling/seasonal, FX, regional). It is a controlled comparison, not an OOS-selected model. SHAP explains the exact frozen official holdout CatBoost on a deterministic holdout sample, not a separately retrained proxy.
-
-See [RESULTS.md](docs/RESULTS.md) and `notebooks/FoodShock_MLSC2026_Solution.ipynb` for the actual generated numbers, interpretation, limitations, and reproducible inference example. In V9, persistence slightly beats CatBoost on pooled RMSE; logistic regression also has slightly higher F1 than the hybrid. Neither the system's benefit nor the +5% alerts are guaranteed. The stronger contribution is the auditable uncertainty/risk decision-support workflow, not a claim of universal prediction superiority.
-
-## 5. Streamlit application modes
-
-- Home: dynamically reads the V9 official benchmark and hybrid evaluation (with the Stage-2 PR-AUC separately labeled).
-- EDA / Preprocessing: reads the same packaged model-ready dataset, displays coverage and explains temporal assumptions.
-- Model Training: seven-fold results, ablation, exact-model SHAP and official holdout metadata; custom training uses the same engine and a separate 18-month holdout.
-- Prediction / Historical out-of-sample: select country, commodity, market, series and origin month; load that fold's frozen model, infer on the corresponding feature row, and verify against the stored benchmark before displaying the actual next-month value. Graph uses target-month alignment.
-- Official holdout model what-if: uses the frozen CatBoost model for the June 2024–November 2025 holdout, with its own calibration and threshold. This is not a model retrained through the last observed month for live 2026 forecasts.
-- Custom model what-if: uses the session's complete model bundle, its own threshold, and only category combinations seen during fit. Direct mode does not invent intervals. Basic what-if changes the current price only; advanced what-if constructs a coherent synthetic past-price history and recalculates all dependent lag/rolling/momentum/seasonal/regional features. FX is held fixed. Synthetic defaults are explicitly labeled.
-
-The same `core/models.py`, `core/utils.py`, `core/features.py`, and `core/model_store.py` are used by evaluation and the application. Hash checks guard the packaged data, evaluation CSVs, and loaded model files. The UI is intentionally decision support, not a live API. Full browser execution was not available in the build environment because Streamlit could not be installed; core model/inference parity and integration tests were executed successfully.
-
-## 6. Files for reviewers
-
-| File | Purpose |
-|---|---|
-| `src/run_v9.py` | Canonical full benchmark, ablation, SHAP and frozen model generation |
-| `src/prepare_data.py` | Correct supplied panel or optionally reconstruct from original raw WFP extract |
-| `core/models.py`, `core/utils.py`, `core/features.py` | Shared temporal engine, model inference, alert and feature formulas |
-| `core/model_store.py` | Dataset, evaluation and model artifact verification |
-| `data/foodshock_asean_model_ready.csv` | Required packaged model-ready dataset |
-| `data/v9_manifest.json` | Exact versions, dataset/model/result hashes, official fit and calibration metadata |
-| `data/v9_oos_predictions.csv` | Actual per-row predictions for 5 ML algorithms across seven folds |
-| `data/v9_official_holdout_predictions.csv` | Actual rows from separate 18-month official model holdout |
-| `data/fold_models/`, `data/v9_official_bundle.joblib` | Frozen fold/holdout model artifacts |
-| `data/model_evaluation_results.csv`, `data/model_eval_*` | Regression, subgroup, and classification evaluation |
-| `data/v9_fold_metrics.csv`, `data/hyperparameter_tuning_summary.csv` | Fold dates, fit/calibration/test counts, validation threshold, tuning metadata |
-| `data/v9_feature_ablation.csv`, `data/v9_shap_importance.csv` | Feature contribution and exact-model interpretability |
-| `notebooks/FoodShock_MLSC2026_Solution.ipynb` | Executed technical narrative and reproducible demonstration |
-| `app.py`, `application/` | Streamlit application |
-| `tests/test_v9.py`, `docs/VALIDATION_REPORT.md` | Executed integration tests and known limitations |
-| `docs/DATA_SOURCES.md` | Dataset provenance |
-
-## 7. Preliminary-round scope
-
-The supplied guidebook requires source code and dataset for preliminary judging; presentation and live demo are final-round items. This package focuses on the five preliminary criteria (problem formulation, data quality, ML implementation, evaluation, innovation/impact). It does not claim guaranteed qualification, verified real-world impact, or official panitia scoring. Confirm the exact raw WFP resource/license and applicable competition rules before submitting. 
+Panduan penilaian: Guidebook Machine Learning Solution Challenge 2026, halaman 9–10; proyek difokuskan pada rubrik penyisihan (problem identification, data preparation, ML implementation, model evaluation, innovation).
