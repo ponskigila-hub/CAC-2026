@@ -1,0 +1,5 @@
+# Methodology
+
+Metodologi utama tersedia di README bagian 4–5 dan notebook. Source of truth adalah `src/forecast.py` (prepare, eligible, pairs, features, forecast_path) serta `src/train.py` (fit, evaluate, choose_threshold, metric, main). Data bulanan diproses tanpa interpolasi harga. Price regression dan shock classification merupakan dua model paralel; classifier tidak menggunakan hasil regression sebagai fitur sehingga tidak ada propagasi prediksi harga ke risk model. Target date digunakan sebagai horizon dari observasi terakhir eligible masing-masing series. Pada target 25–36 bulan, model langsung memprediksi log perubahan harga dari origin; tidak menyalin fitur dari bulan kalender yang sama. Di atas 36 bulan, aplikasi memberi label ekstrapolasi dan tidak mengeluarkan risk score ML.
+
+Forecast path dan test prediction menggunakan parameter model sesuai cutoff berbeda. Laporan holdout tidak boleh dianggap sebagai evaluasi dari frozen deployment refit. Model deployment mempelajari semua periode melalui training pool hingga 2025; sampling deterministik diterapkan untuk efisiensi.
