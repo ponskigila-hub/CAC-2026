@@ -1,10 +1,13 @@
-"""Preprocessing, audit coverage, zero-leakage FE."""
+"""Preprocessing, audit coverage, time-aware FE."""
 from __future__ import annotations
 
 import streamlit as st
 
-from data_loader import load_country_coverage, load_commodity_coverage, load_model_ready
-from styles import inject_css, hero, section
+from application.data_loader import load_country_coverage, load_commodity_coverage, load_model_ready
+from core.models import validate_panel
+from core.utils import FEATURE_COLS
+import pandas as pd
+from application.styles import inject_css, hero, section
 
 
 def render():
@@ -12,8 +15,8 @@ def render():
 
     st.markdown(
         hero("Preprocessing & Data Audit",
-             "Coverage ≥ 60 months · unit standardisation · calendar-safe zero-leakage features",
-             pills=[("Data Integrity", "pill-green"), ("Zero Leakage", "pill-sky")]),
+             "Coverage ≥ 60 months · unit standardisation · calendar-safe time-aware features",
+             pills=[("Data Integrity", "pill-green"), ("Temporal Audit", "pill-sky")]),
         unsafe_allow_html=True,
     )
 
@@ -47,7 +50,7 @@ def render():
             <div class="panel">
             <strong style="color:#6EE7B7;">Calendar-Safe FE</strong><br/>
             <span style="color:#94A3B8; font-size:0.85rem;">
-            Full monthly re-index without forward-fill of raw prices; lags from shift(1).
+            Full monthly re-index without forward-fill of raw prices; lags from shift(1). Current USD price is known at forecast origin.
             </span></div>
             """,
             unsafe_allow_html=True,
@@ -59,17 +62,21 @@ def render():
     st.markdown(section("Commodity Group Coverage"), unsafe_allow_html=True)
     st.dataframe(load_commodity_coverage(), use_container_width=True, hide_index=True)
 
-    st.info(
-        "**IDN & THA:** series end around May 2024 and March 2020 respectively. "
-        "The official test window (Jun 2024 – Nov 2025) therefore contains only "
-        "training history for these countries — consistent with strict time-based validation."
-    )
+    st.info("V9 uses seven expanding walk-forward folds (June 2019–June 2025 starts). "
+            "Training labels must mature strictly before each cutoff; inner calibration uses the same rule. "
+            "Series eligibility was selected retrospectively on the supplied panel, so this is not a fully prospective deployment study.")
 
     st.markdown(section("Residual Target Formulation"), unsafe_allow_html=True)
     st.latex(r"\Delta y_{t+1} = y_{t+1} - y_t \qquad \hat{y}_{t+1} = y_t + \widehat{\Delta y}_{t+1}")
 
     st.markdown(section("Feature Preview"), unsafe_allow_html=True)
     df = load_model_ready()
+    validate_panel(df)
+    a,b,c=st.columns(3)
+    a.metric("Model-ready rows",f"{len(df):,}")
+    b.metric("Duplicate series/month",int(df.duplicated(["series_id","date"]).sum()))
+    c.metric("Missing required features",int(df[FEATURE_COLS].isna().sum().sum()))
+    st.caption("Source: Global Food Prices Database (WFP), distributed on Kaggle by abhishekgupta56447. The original raw snapshot is not bundled. See docs/DATA_SOURCES.md.")
     cols = [
         "date", "countryiso3", "commodity_group", "pricetype", "usdprice",
         "lag_1", "lag_12", "rolling_mean_6", "cv_6", "pct_change_1m",

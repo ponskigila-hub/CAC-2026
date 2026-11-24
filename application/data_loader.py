@@ -5,12 +5,14 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from core.model_store import verify_results
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
 @st.cache_data(show_spinner=False)
 def load_model_ready() -> pd.DataFrame:
+    verify_results(DATA_DIR)
     path = DATA_DIR / "foodshock_asean_model_ready.csv"
     df = pd.read_csv(path)
     if "date" in df.columns:

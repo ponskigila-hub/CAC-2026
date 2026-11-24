@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import streamlit as st
 
-from styles import inject_css
-from views import home, eda, preprocessing, training, prediction
+from application.styles import inject_css
+from application.views import home, eda, preprocessing, training, prediction
+from application.data_loader import load_model_ready
 
 st.set_page_config(
     page_title="FoodShock · MLSC 2026",
@@ -28,17 +29,22 @@ PAGES = {
 }
 
 with st.sidebar:
+    try:
+        df=load_model_ready()
+    except Exception as exc:
+        st.error(f"V9 data integrity check failed: {exc}. Run python src/run_v9.py and restart the app.")
+        st.stop()
     st.markdown(
-        """
+        f"""
         <div class="sidebar-brand">
             <div class="logo">🌾 FoodShock</div>
             <div class="tag">MLSC 2026 · SDG 2: Zero Hunger</div>
         </div>
         <div class="sidebar-stats">
-            <strong>7</strong> ASEAN countries<br/>
-            <strong>5</strong> commodity groups<br/>
-            <strong>27,950</strong> clean observations<br/>
-            Residual forecasting · Zero leakage
+            <strong>{df.countryiso3.nunique()}</strong> ASEAN countries<br/>
+            <strong>{df.commodity_group.nunique()}</strong> commodity groups<br/>
+            <strong>{len(df):,}</strong> model-ready observations<br/>
+            V9 · Temporal validation
         </div>
         """,
         unsafe_allow_html=True,

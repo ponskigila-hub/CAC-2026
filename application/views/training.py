@@ -1,16 +1,20 @@
-"""Interactive model training — V2 residual + two-stage artefacts."""
+"""V9 official benchmark, exact official holdout, and custom training."""
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
-from data_loader import (
+from application.data_loader import (
     load_model_ready, load_model_results, load_shock_metrics,
     load_eval_by_commodity, load_eval_by_pricetype, get_filter_options,
 )
-from models import available_algorithms, train_and_evaluate
-from styles import inject_css, apply_plot_style, hero, section, COLORS
+from core.models import available_algorithms, train_and_evaluate, make_bundle
+from core.model_store import load_manifest
+from pathlib import Path
+DATA=Path(__file__).resolve().parents[2]/"data"
+FIG=DATA.parent/"figures"
+from application.styles import inject_css, apply_plot_style, hero, section, COLORS
 
 
 def render():
@@ -21,7 +25,7 @@ def render():
         hero(
             "Model Training & Evaluation",
             "Residual vs Direct · live hyperparameters · expanding / time-based validation",
-            pills=[("Walk-Forward V2", "pill-sky"), ("vs Persistence", "pill-amber")],
+            pills=[("7-Fold Walk-Forward", "pill-sky"), ("vs Persistence", "pill-amber")],
         ),
         unsafe_allow_html=True,
     )
@@ -30,34 +34,47 @@ def render():
     results = load_model_results()
     show_cols = [c for c in [
         "model", "MAE_micro", "RMSE_micro", "sMAPE_micro", "R2_micro",
-        "MAE_macro", "SS_RMSE", "DM_stat", "DM_pvalue",
+        "MAE_macro", "SS_RMSE", "DM_stat", "DM_pvalue", "SS_RMSE_CI95",
     ] if c in results.columns]
     if not show_cols:
         show_cols = list(results.columns)
-    fmt = {c: "{:.4f}" for c in show_cols if c != "model"}
+    fmt = {c: "{:.4f}" for c in show_cols if c != "model" and pd.api.types.is_numeric_dtype(results[c])}
     st.dataframe(
         results[show_cols].style.format(fmt, na_rep="—"),
         use_container_width=True, hide_index=True,
     )
 
-    st.markdown(section("Stage-2 Shock Classifier (Walk-Forward OOF)"), unsafe_allow_html=True)
+    st.markdown(section("Hybrid Alert & Baselines (Walk-Forward OOS)"), unsafe_allow_html=True)
     shock = load_shock_metrics()
     if len(shock):
         st.dataframe(shock.style.format(precision=4), use_container_width=True, hide_index=True)
     else:
         st.warning("model_eval_shock_classification.csv not found")
 
-    t1, t2 = st.tabs(["By Commodity", "By Price Type"])
+    st.caption("PR-AUC and ROC-AUC refer to each continuous ranking score, not the binary hybrid decision. Hybrid rows report decision metrics only.")
+    t1, t2, t3 = st.tabs(["By Commodity", "By Price Type", "By Country"])
     with t1:
         st.dataframe(load_eval_by_commodity(), use_container_width=True, hide_index=True)
     with t2:
         st.dataframe(load_eval_by_pricetype(), use_container_width=True, hide_index=True)
 
+    with t3:
+        st.dataframe(pd.read_csv(DATA/"model_eval_by_country.csv"),use_container_width=True,hide_index=True)
+    st.markdown(section("Feature Ablation & Explainability"),unsafe_allow_html=True)
+    st.dataframe(pd.read_csv(DATA/"v9_feature_ablation.csv"),use_container_width=True,hide_index=True)
+    st.caption("Controlled ablation: the same fitted time periods and tuned CatBoost parameters; no OOS-driven feature selection.")
+    st.image(str(FIG/"shap_summary.png"),caption="SHAP on the exact frozen official CatBoost holdout model (not a retrained proxy).",use_container_width=True)
+    st.markdown(section("Frozen Official Holdout Model"),unsafe_allow_html=True)
+    manifest=load_manifest()
+    st.caption(f"Fit through {manifest['official_fit_end']} · calibration {manifest['official_cal_start']} to {manifest['official_cal_end']} · 18-month holdout starts {manifest['official_holdout_cutoff']}")
+    st.json({"parameters":manifest["official_params"],"threshold":manifest["official_threshold"],"qcal":manifest["official_qcal"],"holdout_metrics":manifest["official_holdout_metrics"]},expanded=False)
+    with st.expander("Per-fold temporal split and validation thresholds"):
+        st.dataframe(pd.read_csv(DATA/"v9_fold_metrics.csv"),hide_index=True)
     st.markdown("---")
     st.markdown(section("Interactive Training Panel"), unsafe_allow_html=True)
     st.caption(
-        "Interactive runs use a **time-based hold-out** (last N months) for speed. "
-        "Paper results use **6-fold expanding-window walk-forward** (see benchmark table above)."
+        "Custom training uses the same purged fit/calibration engine with an 18-month holdout. "
+        "Its metrics and fitted threshold are separate from the official seven-fold benchmark."
     )
 
     df = load_model_ready()
@@ -76,11 +93,12 @@ def render():
         )
         sel_countries = st.multiselect("Countries (empty = All)", opts["countries"])
         sel_commodities = st.multiselect("Commodities (empty = All)", opts["commodities"])
-        n_estimators = st.slider("n_estimators", 50, 600, 250, 50)
+        n_estimators = st.slider("n_estimators", 50, 600, 150, 25)
         learning_rate = st.select_slider(
             "learning_rate", options=[0.01, 0.02, 0.03, 0.05, 0.08, 0.1, 0.15], value=0.05
         )
         max_depth = st.slider("max_depth", 3, 12, 6)
+        tune = st.checkbox("Tune within the fit period (25 Optuna trials)",value=False)
         run = st.button("Run Training & Evaluation", type="primary", use_container_width=True)
 
     with right:
@@ -100,42 +118,27 @@ def render():
                         out = train_and_evaluate(
                             train_df, algorithm=algorithm, target_mode=target_mode,
                             n_estimators=n_estimators, learning_rate=learning_rate,
-                            max_depth=max_depth,
+                            max_depth=max_depth,tune_trials=25 if tune else 0,
                         )
                     except Exception as e:
                         st.error(f"Training failed: {e}")
                         out = None
 
                 if out:
-                    # Persist full two-stage bundle
-                    for k in ("model", "q10_model", "q90_model", "shock_clf",
-                              "encoders", "feature_names", "target_mode", "metrics"):
-                        st.session_state[k if k != "model" else "trained_model"] = out[k]
-                    st.session_state["trained_encoders"] = out["encoders"]
-                    st.session_state["trained_features"] = out["feature_names"]
-                    st.session_state["trained_mode"] = out["target_mode"]
-                    st.session_state["trained_metrics"] = out["metrics"]
-                    st.session_state["q10_model"] = out["q10_model"]
-                    st.session_state["q90_model"] = out["q90_model"]
-                    st.session_state["shock_clf"] = out["shock_clf"]
-                    st.session_state["two_stage_bundle"] = {
-                        "model": out["model"],
-                        "q10_model": out["q10_model"],
-                        "q90_model": out["q90_model"],
-                        "shock_clf": out["shock_clf"],
-                        "encoders": out["encoders"],
-                        "feature_names": out["feature_names"],
-                        "target_mode": out["target_mode"],
-                    }
+                    st.session_state["two_stage_bundle"]=make_bundle(out)
+                    st.session_state["trained_metrics"]=out["metrics"]
 
                     m = out["metrics"]
-                    st.success(f"Done · train={m['n_train']:,} · test={m['n_test']:,}")
+                    st.success(f"Done · fit={m['n_train']:,} · calibration={m['n_calibration']:,} · test={m['n_test']:,}")
+                    st.caption(f"Fit ends {out['fit_end']} · calibration ends {out['cal_end']} · holdout starts {out['cutoff']} · threshold={out['threshold']:.3f}")
                     d1, d2, d3, d4 = st.columns(4)
                     d1.metric("MAE", f"{m['MAE']:.4f}", f"{m['MAE']-m['Persistence_MAE']:+.4f} vs Pers.")
                     d2.metric("RMSE", f"{m['RMSE']:.4f}", f"{m['RMSE']-m['Persistence_RMSE']:+.4f} vs Pers.")
                     d3.metric("sMAPE", f"{m['sMAPE']:.2f}%")
-                    d4.metric("PICP P10–P90", f"{m.get('PICP_P10_P90', float('nan'))*100:.1f}%")
+                    d4.metric("80% interval coverage", f"{m['PICP_P10_P90']*100:.1f}%" if pd.notna(m['PICP_P10_P90']) else "Not available")
 
+                    st.write("Hybrid alert metrics (custom holdout):", {k:m[k] for k in ("Precision","Recall","F1","FPR","TP","FP","FN","TN")})
+                    st.write("Stage-2 ranking metrics:", {k:m[k] for k in ("PR_AUC","ROC_AUC")})
                     comp = pd.DataFrame([
                         {"Model": m["model"], "MAE": m["MAE"], "RMSE": m["RMSE"],
                          "sMAPE": m["sMAPE"], "R2": m["R2"]},

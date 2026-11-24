@@ -4,8 +4,8 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import streamlit as st
 
-from data_loader import load_model_ready, get_filter_options
-from styles import inject_css, apply_plot_style, hero, section, COLORS
+from application.data_loader import load_model_ready, get_filter_options
+from application.styles import inject_css, apply_plot_style, hero, section, COLORS
 
 
 def render():
@@ -49,7 +49,7 @@ def render():
     for i, grp in enumerate(trend["commodity_group"].unique()):
         g = trend[trend["commodity_group"] == grp]
         ax.plot(g["date"], g["usdprice"], label=grp, lw=1.8, color=COLORS["chart"][i % len(COLORS["chart"])])
-    ax.set_ylabel("Mean USD Price")
+    ax.set_ylabel("Mean USD per standard unit")
     ax.legend(loc="upper left", fontsize=8, framealpha=0.9)
     ax.set_title("Average Price by Commodity Group")
     st.pyplot(fig, clear_figure=True)
@@ -64,7 +64,7 @@ def render():
         ax.axvline(0.05, color=COLORS["coral"], ls="--", lw=1.3, label="+5% threshold")
         ax.axvline(-0.05, color=COLORS["sky"], ls="--", lw=1.3, label="−5%")
         ax.set_xlabel("pct_change_1m")
-        ax.set_title("1-Month % Change Distribution")
+        ax.set_title("Lagged 1-Month % Change Distribution")
         ax.legend(fontsize=7)
         st.pyplot(fig, clear_figure=True)
         plt.close(fig)
@@ -79,8 +79,8 @@ def render():
 
     st.markdown(section("Retail vs Wholesale"), unsafe_allow_html=True)
     if sub["pricetype"].nunique() > 1:
-        comp = sub.groupby(["commodity_group", "pricetype"])["usdprice"].mean().unstack(fill_value=0)
-        st.dataframe(comp.style.format("{:.3f}"), use_container_width=True)
+        comp = sub.groupby(["commodity_group", "pricetype"])["usdprice"].mean().unstack()
+        st.dataframe(comp.style.format("{:.3f}",na_rep="N/A"), use_container_width=True)
     else:
         st.info("Select both Retail and Wholesale to compare market types.")
 

@@ -5,3 +5,6 @@ __pycache__/
 venv/
 asean_wfp_2015_2025.csv
 .git/
+
+cac2026-venv/
+.env

@@ -1,9 +1,1 @@
-Shock: upward only target_pct_change_t1 > +0.05 (SDG 2.c).
-Threshold: chosen inside each train fold on month-block validation (no row-wise month split).
-F1-optimal mean thr=0.400; Operational (prec>=0.2 or F0.5) mean thr=0.633.
-Threshold folds: precision_floor=5 f0.5_fallback=1
-Ops metrics: P=0.163 R=0.192 F1=0.176 FDR=0.837 FPR=0.097
-F1 metrics: P=0.121 R=0.641 F1=0.204
-Momentum: P=0.136 R=0.133 PR-AUC=0.102 ROC=0.494
-Conformalized quantile overall PICP=0.802 mean width=0.2919
-FX features: from WFP price/usdprice when raw present; else precomputed columns in model-ready CSV.
+Upward shock: (next price - current price) / current price > 0.05 (numerical tolerance 1e-12). The threshold is a project-specific upper-tail policy definition, not official ALPS. Hybrid risk-score thresholds are selected separately on chronological calibration blocks with the exact frozen point and classifier; see v9_fold_metrics.csv and v9_manifest.json. Stage-2 scores are not calibrated probabilities.
