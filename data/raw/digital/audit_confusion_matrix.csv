@@ -1,0 +1,17 @@
+manual_label,langdetect_label,count
+Indonesian,Indonesian,322
+English,Indonesian,2
+Mixed Indonesian-English,Indonesian,25
+Another language,Indonesian,0
+Indonesian,English,3
+English,English,138
+Mixed Indonesian-English,English,0
+Another language,English,0
+Indonesian,Mixed Indonesian-English,0
+English,Mixed Indonesian-English,0
+Mixed Indonesian-English,Mixed Indonesian-English,0
+Another language,Mixed Indonesian-English,0
+Indonesian,Another language,0
+English,Another language,0
+Mixed Indonesian-English,Another language,0
+Another language,Another language,10

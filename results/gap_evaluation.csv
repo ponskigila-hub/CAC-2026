@@ -1,0 +1,543 @@
+id,hidden,actual_field,predicted_field,global_hit,oracle_hit,end_to_end_hit,frequency_end_to_end_hit
+0,CSS,Software Development,Software Development,1,1,1,1
+1,C#,Software Development,Software Development,0,1,1,0
+2,REST API,Software Development,Software Development,1,1,1,1
+5,IT troubleshooting,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+6,Microservices,Software Development,Software Development,0,0,0,0
+9,React,Software Development,Design,0,1,0,0
+11,Testing,Software Development,Software Development,0,0,0,0
+16,Digital advertising,Design,Design,0,0,0,0
+18,Adobe Photoshop,Design,Design,0,1,1,1
+19,Linux,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+26,MySQL,Infrastructure & Security,Software Development,0,0,1,0
+28,C#,Software Development,Software Development,0,1,1,0
+29,Networking,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+35,Git,Software Development,Software Development,0,1,1,0
+39,Agile,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+40,Problem solving,Software Development,Software Development,1,1,1,1
+47,Testing,Software Development,Software Development,0,1,1,0
+49,SQL,Software Development,Software Development,1,0,0,1
+62,SQL,Software Development,Software Development,1,0,0,1
+63,Firebase,Software Development,Software Development,0,0,0,0
+83,Data modeling,Data & AI,Data & AI,0,0,0,0
+86,IT troubleshooting,Infrastructure & Security,Software Development,0,1,0,0
+95,Linux,Software Development,Software Development,0,0,0,0
+97,GraphQL,Software Development,Software Development,0,0,0,0
+103,PHP,Software Development,Software Development,0,0,0,0
+105,Agile,Software Development,Software Development,0,0,0,0
+109,PHP,Infrastructure & Security,Infrastructure & Security,1,0,0,0
+113,C#,Software Development,Software Development,0,0,0,0
+115,HTML,Infrastructure & Security,Software Development,1,0,1,1
+122,Swift,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+123,Oracle,Software Development,Software Development,0,0,0,0
+127,Teamwork,Design,Design,0,0,0,0
+131,React Native,Software Development,Software Development,0,0,0,0
+132,Google Analytics,Digital Marketing,Digital Marketing,0,1,1,1
+134,Git,Software Development,Software Development,0,1,1,0
+140,Social media,Digital Marketing,Digital Marketing,0,1,1,1
+143,Dart,Software Development,Software Development,0,0,0,0
+146,Adobe Photoshop,Design,Digital Marketing,0,1,0,0
+151,Network security,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+152,React,Software Development,Software Development,0,0,0,0
+156,Git,Software Development,Software Development,1,1,1,1
+161,Content marketing,Digital Marketing,Digital Marketing,0,0,0,0
+162,UX research,Design,Design,0,0,0,0
+166,Testing,Design,Design,0,1,1,0
+170,CI/CD,Software Development,Software Development,0,0,0,0
+172,Angular,Software Development,Software Development,0,0,0,0
+176,MongoDB,Software Development,Software Development,0,0,0,0
+180,Canva,Digital Marketing,Design,0,0,0,0
+189,Meta Ads,Digital Marketing,Digital Marketing,0,0,0,0
+194,IT troubleshooting,Infrastructure & Security,Data & AI,0,1,0,0
+206,Kubernetes,Software Development,Software Development,0,0,0,0
+207,Node.js,Software Development,Software Development,0,0,0,0
+214,ETL,Data & AI,Data & AI,0,1,1,1
+218,SQL,Software Development,Software Development,1,1,1,1
+221,React,Software Development,Software Development,1,1,1,1
+223,Network security,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+225,Figma,Design,Design,0,1,1,1
+230,C++,Software Development,Software Development,0,0,0,0
+234,Network security,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+237,JavaScript,Software Development,Software Development,1,1,1,1
+238,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+257,Python,Infrastructure & Security,Software Development,0,0,0,0
+266,React,Software Development,Software Development,0,0,0,0
+268,Flutter,Software Development,Software Development,0,0,0,0
+274,Communication,Software Development,Design,0,0,0,1
+278,JSON,Software Development,Software Development,0,0,0,0
+281,SQL Server,Software Development,Software Development,0,0,0,0
+282,HTML,Software Development,Software Development,1,1,1,1
+283,Content creation,Digital Marketing,Digital Marketing,0,0,0,0
+290,SQL,Infrastructure & Security,Infrastructure & Security,1,1,1,0
+302,Angular,Software Development,Software Development,0,0,0,0
+303,SQL,Software Development,Software Development,1,1,1,1
+305,Java,Software Development,Software Development,1,1,1,1
+312,SQL,Software Development,Software Development,1,0,0,1
+315,Testing,Software Development,Software Development,0,0,0,0
+321,Adobe Illustrator,Design,Design,0,1,1,1
+330,Node.js,Software Development,Software Development,0,0,0,0
+336,Linux,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+340,Copywriting,Digital Marketing,Digital Marketing,0,0,0,0
+361,Problem solving,Software Development,Software Development,0,0,0,0
+366,Content creation,Design,Design,0,0,0,0
+369,Go,Software Development,Software Development,0,0,0,0
+370,Social media,Digital Marketing,Design,0,1,1,1
+372,Testing,Software Development,Software Development,0,0,0,0
+382,Cybersecurity,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+392,Network security,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+397,REST API,Software Development,Software Development,0,1,1,0
+399,Java,Software Development,Software Development,1,1,1,1
+400,Google Ads,Digital Marketing,Digital Marketing,0,1,1,1
+412,Laravel,Software Development,Software Development,0,1,1,0
+426,ASP.NET,Software Development,Software Development,0,1,1,0
+434,Testing,Software Development,Software Development,0,0,0,0
+435,Laravel,Software Development,Software Development,0,0,0,0
+443,TypeScript,Software Development,Software Development,0,0,0,0
+450,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+453,Java,Software Development,Software Development,1,1,1,1
+462,Social media,Digital Marketing,Digital Marketing,0,1,1,1
+463,PHP,Software Development,Software Development,1,1,1,1
+472,PHP,Software Development,Software Development,1,1,1,1
+489,JavaScript,Software Development,Software Development,1,1,1,1
+490,Linux,Software Development,Software Development,0,0,0,0
+503,REST API,Software Development,Software Development,0,1,1,0
+509,IT troubleshooting,Software Development,Software Development,0,0,0,0
+512,IT troubleshooting,Design,Design,0,0,0,0
+519,PHP,Software Development,Software Development,0,0,0,0
+524,PHP,Software Development,Software Development,1,1,1,1
+541,Angular,Software Development,Software Development,0,0,0,0
+543,Java,Software Development,Software Development,1,1,1,1
+547,Copywriting,Digital Marketing,Digital Marketing,0,1,1,1
+551,Statistics,Data & AI,Data & AI,0,1,1,1
+562,Communication,Digital Marketing,Digital Marketing,0,1,1,1
+566,Meta Ads,Digital Marketing,Digital Marketing,0,0,0,0
+570,REST API,Software Development,Software Development,0,1,1,0
+573,SEO,Digital Marketing,Software Development,0,1,0,0
+577,Java,Software Development,Software Development,1,1,1,1
+581,Kubernetes,Software Development,Software Development,0,0,0,0
+586,Agile,Software Development,Software Development,0,0,0,0
+587,Problem solving,Software Development,Software Development,0,0,0,0
+599,Statistics,Data & AI,Data & AI,0,1,1,1
+600,MySQL,Software Development,Software Development,0,1,1,0
+614,Agile,Software Development,Software Development,0,0,0,0
+619,Agile,Software Development,Software Development,0,0,0,0
+621,JavaScript,Software Development,Software Development,1,1,1,1
+624,SQL Server,Software Development,Software Development,0,0,0,0
+626,Communication,Design,Design,0,1,1,1
+628,JSON,Software Development,Software Development,0,0,0,0
+630,Python,Software Development,Software Development,0,1,1,0
+640,REST API,Software Development,Software Development,0,0,0,0
+644,REST API,Software Development,Software Development,1,1,1,1
+660,Firebase,Software Development,Software Development,0,0,0,0
+673,HTML,Software Development,Software Development,1,1,1,1
+675,Excel,Data & AI,Data & AI,0,0,0,0
+678,Vue,Software Development,Software Development,0,0,0,0
+691,TypeScript,Software Development,Software Development,0,0,0,0
+697,Testing,Software Development,Software Development,0,0,0,0
+700,Problem solving,Software Development,Software Development,0,0,0,0
+704,Networking,Infrastructure & Security,Infrastructure & Security,0,0,0,1
+707,GCP,Software Development,Software Development,0,0,0,0
+711,Git,Design,Software Development,1,0,1,1
+716,SQL Server,Software Development,Software Development,0,0,0,0
+719,Testing,Software Development,Software Development,0,0,0,0
+720,Flutter,Software Development,Software Development,0,0,0,0
+721,WordPress,Digital Marketing,Digital Marketing,0,0,0,0
+741,SQL Server,Software Development,Software Development,0,0,0,0
+754,JavaScript,Software Development,Software Development,1,1,1,1
+765,Social media,Digital Marketing,Digital Marketing,0,1,1,1
+769,IT troubleshooting,Software Development,Software Development,0,0,0,0
+776,Virtualization,Infrastructure & Security,Infrastructure & Security,0,1,1,0
+778,Problem solving,Software Development,Software Development,1,0,0,1
+787,REST API,Software Development,Software Development,0,1,1,0
+789,Angular,Software Development,Software Development,0,0,0,0
+808,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+810,Flutter,Software Development,Software Development,0,0,0,0
+816,Adobe Photoshop,Design,Design,0,1,1,1
+820,Spring,Software Development,Software Development,0,0,0,0
+821,REST API,Software Development,Software Development,0,1,1,0
+828,XML,Software Development,Software Development,0,0,0,0
+830,SQL Server,Software Development,Software Development,0,0,0,0
+834,Java,Software Development,Software Development,1,1,1,1
+835,Spring,Software Development,Software Development,0,0,0,0
+837,Communication,Software Development,Software Development,0,0,0,0
+841,Social media,Digital Marketing,Digital Marketing,0,1,1,1
+843,CI/CD,Software Development,Infrastructure & Security,0,0,0,0
+855,Adobe Photoshop,Design,Design,0,1,1,1
+858,MySQL,Software Development,Software Development,1,1,1,0
+862,SQL Server,Software Development,Software Development,0,0,0,0
+883,Data visualization,Data & AI,Data & AI,0,0,0,0
+887,Meta Ads,Digital Marketing,Digital Marketing,0,1,1,1
+891,MySQL,Software Development,Software Development,1,1,1,0
+894,Teamwork,Software Development,Software Development,0,0,0,0
+895,React,Software Development,Software Development,0,0,0,0
+896,Laravel,Software Development,Software Development,0,1,1,0
+925,JSON,Software Development,Software Development,0,0,0,0
+929,Oracle,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+931,JSON,Software Development,Software Development,0,0,0,0
+934,Machine learning,Data & AI,Data & AI,0,1,1,0
+937,Problem solving,Software Development,Software Development,0,0,0,0
+941,Flutter,Software Development,Software Development,0,0,0,0
+951,REST API,Software Development,Software Development,0,0,0,0
+952,SQL Server,Software Development,Software Development,0,0,0,0
+962,JavaScript,Software Development,Software Development,1,1,1,1
+967,Scikit-learn,Data & AI,Data & AI,0,0,0,0
+969,Communication,Software Development,Software Development,0,0,0,0
+970,Spark,Data & AI,Data & AI,0,1,1,1
+975,TypeScript,Software Development,Software Development,0,0,0,0
+987,Problem solving,Data & AI,Data & AI,0,0,0,0
+996,Java,Software Development,Software Development,1,1,1,1
+997,PHP,Software Development,Software Development,0,1,1,0
+1004,IT troubleshooting,Software Development,Software Development,0,0,0,0
+1010,C#,Software Development,Software Development,0,0,0,0
+1011,Java,Software Development,Software Development,1,1,1,1
+1020,Spring,Software Development,Software Development,0,0,0,0
+1025,Communication,Digital Marketing,Digital Marketing,0,1,1,1
+1043,WordPress,Software Development,Digital Marketing,0,0,0,0
+1046,Agile,Software Development,Software Development,0,1,1,0
+1047,HTML,Software Development,Software Development,1,1,1,1
+1051,Windows Server,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1052,SQL,Infrastructure & Security,Infrastructure & Security,1,0,0,0
+1053,ASP.NET,Software Development,Software Development,0,0,0,0
+1057,ASP.NET,Software Development,Software Development,0,0,0,0
+1065,PHP,Software Development,Software Development,1,1,1,1
+1066,Figma,Design,Design,0,1,1,1
+1074,Networking,Software Development,Software Development,0,0,0,0
+1078,Flutter,Software Development,Software Development,0,0,0,0
+1079,HTML,Software Development,Software Development,1,1,1,1
+1080,Linux,Software Development,Software Development,0,0,0,0
+1085,CI/CD,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1095,Swift,Software Development,Software Development,0,0,0,0
+1099,REST API,Software Development,Software Development,0,1,1,0
+1107,WordPress,Software Development,Software Development,0,0,0,0
+1110,PHP,Software Development,Software Development,1,1,1,1
+1115,Azure,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1118,Adobe Photoshop,Design,Design,0,1,1,1
+1120,Testing,Software Development,Software Development,0,0,0,0
+1121,Testing,Software Development,Software Development,0,0,0,0
+1122,Bootstrap,Software Development,Software Development,0,0,0,0
+1133,PHP,Software Development,Software Development,1,1,1,1
+1140,Meta Ads,Digital Marketing,Software Development,0,0,0,0
+1146,GCP,Software Development,Software Development,0,0,0,0
+1147,JavaScript,Software Development,Software Development,1,1,1,1
+1158,React,Software Development,Software Development,1,1,1,1
+1162,REST API,Software Development,Software Development,1,1,1,1
+1191,Git,Software Development,Software Development,1,1,1,1
+1192,Redis,Software Development,Software Development,0,0,0,0
+1198,Cloud computing,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1200,Java,Software Development,Software Development,1,1,1,1
+1202,Google Ads,Digital Marketing,Digital Marketing,0,1,1,1
+1206,JavaScript,Software Development,Software Development,1,1,1,1
+1208,PHP,Software Development,Software Development,0,0,0,0
+1209,SQL,Software Development,Software Development,1,1,1,1
+1211,Angular,Software Development,Software Development,0,0,0,0
+1217,HTML,Software Development,Software Development,1,1,1,1
+1223,Go,Software Development,Software Development,0,0,0,0
+1228,Angular,Software Development,Software Development,0,0,0,0
+1230,Testing,Software Development,Data & AI,0,1,0,0
+1246,Agile,Software Development,Software Development,0,1,1,0
+1248,PyTorch,Software Development,Data & AI,0,0,0,0
+1259,Communication,Infrastructure & Security,Software Development,0,0,0,0
+1266,MySQL,Software Development,Software Development,1,1,1,0
+1273,ETL,Data & AI,Data & AI,0,1,1,1
+1287,Automation,Infrastructure & Security,Software Development,0,1,0,0
+1305,C#,Software Development,Software Development,0,0,0,0
+1306,Linux,Software Development,Software Development,0,0,0,0
+1312,Python,Software Development,Software Development,0,0,0,0
+1313,HTML,Digital Marketing,Digital Marketing,1,0,0,0
+1315,HTML,Software Development,Software Development,1,1,1,1
+1323,Adobe Photoshop,Digital Marketing,Digital Marketing,0,1,1,1
+1327,Linux,Software Development,Software Development,0,0,0,0
+1334,Laravel,Software Development,Software Development,0,1,1,0
+1335,MySQL,Software Development,Software Development,1,1,1,1
+1336,Go,Software Development,Software Development,0,0,0,0
+1352,MySQL,Software Development,Software Development,0,1,1,0
+1353,CSS,Software Development,Software Development,1,1,1,1
+1355,Copywriting,Design,Design,0,0,0,0
+1359,PHP,Software Development,Software Development,0,1,1,0
+1363,ASP.NET,Software Development,Software Development,0,0,0,0
+1366,Automation,Infrastructure & Security,Infrastructure & Security,0,1,1,0
+1373,MySQL,Software Development,Software Development,1,1,1,0
+1381,C#,Software Development,Software Development,0,1,1,0
+1389,ASP.NET,Software Development,Software Development,0,0,0,0
+1390,Communication,Digital Marketing,Digital Marketing,0,1,1,1
+1391,PostgreSQL,Software Development,Software Development,0,0,0,0
+1396,Bootstrap,Software Development,Software Development,0,0,0,0
+1401,MySQL,Software Development,Software Development,0,1,1,0
+1405,Copywriting,Digital Marketing,Digital Marketing,0,0,0,1
+1410,Java,Software Development,Software Development,1,1,1,1
+1413,Spring,Software Development,Software Development,0,0,0,0
+1417,MySQL,Software Development,Software Development,0,1,1,0
+1419,Kubernetes,Infrastructure & Security,Infrastructure & Security,0,1,1,0
+1425,Problem solving,Data & AI,Data & AI,0,1,1,0
+1450,Python,Data & AI,Data & AI,0,1,1,1
+1452,Cloud computing,Software Development,Software Development,0,0,0,0
+1453,Problem solving,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1458,Go,Software Development,Software Development,0,0,0,0
+1466,Go,Software Development,Software Development,0,0,0,0
+1470,UI design,Software Development,Software Development,0,0,0,0
+1471,Excel,Design,Design,0,0,0,0
+1479,JavaScript,Software Development,Software Development,1,1,1,1
+1494,HTML,Software Development,Software Development,1,1,1,1
+1495,Excel,Software Development,Software Development,0,0,0,0
+1498,Linux,Infrastructure & Security,Infrastructure & Security,0,1,1,1
+1502,HTML,Software Development,Software Development,1,1,1,1
+1512,SQL,Software Development,Software Development,1,1,1,1
+1519,Communication,Digital Marketing,Digital Marketing,0,0,0,1
+1524,Python,Data & AI,Data & AI,0,1,1,1
+1528,Social media,Digital Marketing,Digital Marketing,0,1,1,1
+1535,HTML,Software Development,Software Development,1,1,1,1
+1536,Data warehouse,Data & AI,Software Development,0,0,0,0
+1539,Java,Software Development,Software Development,1,1,1,1
+1540,SAP,Software Development,Software Development,0,0,0,0
+1551,Problem solving,Software Development,Software Development,0,0,0,0
+1553,SQL,Software Development,Software Development,1,1,1,1
+1554,Adobe Photoshop,Digital Marketing,Digital Marketing,0,0,0,0
+1556,Teamwork,Software Development,Software Development,0,0,0,0
+1560,Problem solving,Digital Marketing,Digital Marketing,0,0,0,0
+1570,PHP,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1572,PHP,Software Development,Software Development,1,0,0,1
+1573,TypeScript,Software Development,Software Development,0,0,0,0
+1574,Adobe Photoshop,Design,Design,0,1,1,1
+1575,Active Directory,Infrastructure & Security,Infrastructure & Security,0,0,0,0
+1576,Node.js,Software Development,Software Development,0,0,0,0
+1577,Hadoop,Software Development,Software Development,0,0,0,0
+1578,PostgreSQL,Software Development,Software Development,0,0,0,0
+1582,HTML,Software Development,Software Development,1,1,1,1
+1584,C++,Software Development,Data & AI,0,0,0,0
+1586,Automation,Infrastructure & Security,Software Development,0,0,0,0
+1590,Data analysis,Data & AI,Infrastructure & Security,0,0,0,0
+1591,Data warehouse,Data & AI,Data & AI,0,0,0,0
+1594,CSS,Software Development,Software Development,1,1,1,1
+1597,MySQL,Infrastructure & Security,Software Development,0,1,1,0
+1602,SQL,Software Development,Software Development,1,0,0,1
+1607,PHP,Software Development,Software Development,0,0,0,0
+1612,SAP,Software Development,Software Development,0,0,0,0
+1616,WordPress,Software Development,Software Development,0,0,0,0
+1619,JavaScript,Software Development,Software Development,1,1,1,1
+1622,CSS,Software Development,Software Development,1,1,1,1
+1626,Oracle,Infrastructure & Security,Infrastructure & Security,0,1,1,0
+1628,SEO,Digital Marketing,Software Development,0,1,0,0
+1631,PHP,Software Development,Software Development,1,1,1,1
+1634,Content creation,Digital Marketing,Digital Marketing,0,0,0,0
+1637,Spring,Software Development,Software Development,0,0,0,0
+1642,Java,Software Development,Infrastructure & Security,1,1,0,0
+1648,Microservices,Software Development,Software Development,0,0,0,0
+1651,JavaScript,Software Development,Software Development,1,1,1,1
+1653,JavaScript,Software Development,Software Development,1,1,1,1
+1672,React Native,Software Development,Software Development,0,0,0,0
+1679,Problem solving,Software Development,Software Development,0,0,0,0
+1685,Problem solving,Software Development,Software Development,0,0,0,0
+1686,Bootstrap,Software Development,Software Development,0,0,0,0
+1687,SEM,Digital Marketing,Digital Marketing,0,1,1,1
+1693,MySQL,Software Development,Software Development,0,0,0,0
+1695,SQL,Data & AI,Data & AI,1,1,1,1
+1701,React Native,Software Development,Software Development,0,0,0,0
+1705,PHP,Software Development,Software Development,1,1,1,1
+1710,JavaScript,Software Development,Software Development,1,1,1,1
+1717,Microservices,Software Development,Software Development,0,0,0,0
+1719,Networking,Infrastructure & Security,Software Development,0,0,0,0
+1726,Testing,Software Development,Software Development,0,0,0,0
+1728,React,Software Development,Software Development,0,1,1,1
+1729,Node.js,Software Development,Software Development,0,0,0,0
+1737,Kubernetes,Software Development,Software Development,0,0,0,0
+1738,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+1742,Communication,Digital Marketing,Design,0,1,1,1
+1753,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+1756,Spring,Software Development,Software Development,0,0,0,0
+1759,Testing,Software Development,Software Development,0,0,0,0
+1761,Copywriting,Digital Marketing,Design,0,0,0,0
+1765,Angular,Software Development,Software Development,0,0,0,0
+1766,SQL,Software Development,Software Development,1,0,0,1
+1768,Git,Software Development,Software Development,0,1,1,0
+1772,Vue,Software Development,Software Development,0,0,0,0
+1776,JavaScript,Software Development,Software Development,1,1,1,1
+1781,Java,Software Development,Software Development,1,1,1,1
+1792,JavaScript,Software Development,Software Development,1,1,1,1
+1796,Git,Software Development,Software Development,0,1,1,0
+1808,Azure,Software Development,Software Development,0,0,0,0
+1812,C++,Software Development,Software Development,0,0,0,0
+1834,Cloud computing,Software Development,Data & AI,0,0,0,0
+1837,Go,Software Development,Software Development,0,0,0,0
+1843,SQL,Software Development,Software Development,1,0,0,1
+1850,SQL,Software Development,Data & AI,1,1,1,1
+1863,SQL Server,Software Development,Software Development,0,0,0,0
+1864,Communication,Software Development,Software Development,0,0,0,0
+1866,JavaScript,Software Development,Software Development,1,1,1,1
+1868,SQL,Software Development,Software Development,1,1,1,1
+1869,Git,Software Development,Software Development,0,1,1,0
+1871,REST API,Software Development,Software Development,1,0,0,1
+1877,Laravel,Software Development,Software Development,0,0,0,0
+1881,C++,Software Development,Software Development,0,0,0,0
+1890,Git,Software Development,Infrastructure & Security,0,1,0,0
+1892,Communication,Software Development,Software Development,0,0,0,0
+1895,CSS,Software Development,Software Development,1,1,1,1
+1914,Testing,Software Development,Software Development,0,0,0,0
+1921,Communication,Software Development,Software Development,0,0,0,0
+1923,REST API,Software Development,Software Development,0,0,0,0
+1931,C#,Software Development,Software Development,0,1,1,0
+1936,SQL,Software Development,Software Development,1,1,1,1
+1937,PostgreSQL,Software Development,Software Development,0,0,0,0
+1940,Java,Software Development,Software Development,1,0,0,1
+1943,Java,Software Development,Software Development,1,1,1,1
+1945,Microservices,Software Development,Software Development,0,0,0,0
+1972,Jenkins,Software Development,Software Development,0,0,0,0
+1976,Git,Software Development,Software Development,0,0,0,0
+1977,Bootstrap,Software Development,Software Development,0,0,0,0
+1980,Laravel,Software Development,Software Development,0,0,0,0
+1981,Communication,Software Development,Software Development,0,0,0,0
+1986,JavaScript,Software Development,Software Development,1,1,1,1
+1995,Testing,Software Development,Infrastructure & Security,0,1,1,1
+2004,HTML,Digital Marketing,Digital Marketing,1,0,0,0
+2005,JavaScript,Software Development,Software Development,1,1,1,1
+2006,XML,Software Development,Software Development,0,0,0,0
+2008,MySQL,Software Development,Software Development,0,1,1,0
+2009,SQL,Software Development,Software Development,1,1,1,1
+2010,HTML,Software Development,Software Development,1,1,1,1
+2017,Git,Software Development,Infrastructure & Security,0,1,0,0
+2019,REST API,Software Development,Software Development,1,1,1,1
+2020,Git,Software Development,Software Development,0,0,0,0
+2022,JavaScript,Software Development,Software Development,1,1,1,1
+2025,Linux,Software Development,Software Development,0,0,0,0
+2037,Agile,Software Development,Software Development,0,0,0,0
+2045,JavaScript,Software Development,Software Development,1,1,1,1
+2054,Problem solving,Software Development,Software Development,0,0,0,0
+2060,Docker,Software Development,Software Development,0,0,0,0
+2062,SQL,Software Development,Software Development,1,1,1,1
+2070,MySQL,Software Development,Software Development,1,1,1,1
+2071,SQL,Software Development,Infrastructure & Security,1,1,0,0
+2079,Git,Software Development,Software Development,0,1,1,0
+2082,Oracle,Software Development,Software Development,0,0,0,0
+2088,Flutter,Software Development,Software Development,0,0,0,0
+2089,JavaScript,Software Development,Software Development,1,1,1,1
+2096,React Native,Software Development,Software Development,0,0,0,0
+2100,JavaScript,Software Development,Software Development,1,1,1,1
+2102,Ruby,Software Development,Data & AI,0,0,0,0
+2104,UI design,Software Development,Software Development,0,0,0,0
+2109,SQL,Software Development,Software Development,1,1,1,1
+2114,Laravel,Software Development,Software Development,0,0,0,0
+2119,Testing,Software Development,Software Development,0,0,0,0
+2132,Prototyping,Design,Design,0,1,1,0
+2136,SQL,Software Development,Software Development,1,0,0,1
+2141,Problem solving,Software Development,Software Development,0,0,0,0
+2150,Docker,Software Development,Software Development,0,0,0,0
+2182,MySQL,Software Development,Software Development,0,1,1,0
+2197,React,Software Development,Software Development,0,1,1,0
+2203,JavaScript,Software Development,Software Development,1,1,1,1
+2204,CSS,Software Development,Software Development,1,1,1,1
+2212,JavaScript,Software Development,Software Development,1,1,1,1
+2218,Java,Software Development,Software Development,1,1,1,1
+2226,HTML,Software Development,Software Development,1,1,1,1
+2227,CSS,Software Development,Software Development,1,1,1,1
+2232,JavaScript,Software Development,Software Development,1,1,1,1
+2234,SQL,Software Development,Software Development,1,1,1,1
+2241,PostgreSQL,Software Development,Software Development,0,0,0,0
+2246,SQL Server,Software Development,Software Development,0,0,0,0
+2250,MongoDB,Software Development,Software Development,0,0,0,0
+2268,Python,Software Development,Software Development,0,0,0,0
+2270,Agile,Software Development,Software Development,0,0,0,0
+2281,Copywriting,Digital Marketing,Digital Marketing,0,0,0,0
+2288,MongoDB,Software Development,Software Development,0,0,0,0
+2293,JSON,Software Development,Software Development,0,0,0,0
+2295,Java,Software Development,Software Development,1,1,1,1
+2298,HTML,Software Development,Software Development,1,1,1,1
+2306,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+2318,Data analysis,Digital Marketing,Digital Marketing,0,0,0,0
+2323,SEO,Digital Marketing,Digital Marketing,0,1,1,1
+2326,JavaScript,Software Development,Software Development,1,1,1,1
+2330,GraphQL,Software Development,Software Development,0,0,0,0
+2331,Prototyping,Design,Design,0,1,1,0
+2334,React,Software Development,Software Development,0,1,1,0
+2336,Laravel,Software Development,Software Development,0,0,0,0
+2338,Go,Software Development,Software Development,0,0,0,0
+2343,Statistics,Digital Marketing,Digital Marketing,0,0,0,0
+2347,MySQL,Software Development,Software Development,0,0,0,0
+2352,Kotlin,Software Development,Software Development,0,0,0,0
+2361,Git,Software Development,Software Development,0,1,1,0
+2363,React,Software Development,Software Development,0,1,1,1
+2368,Teamwork,Software Development,Software Development,0,0,0,0
+2375,Google Ads,Digital Marketing,Design,0,1,0,0
+2389,Python,Software Development,Software Development,0,1,1,0
+2413,Java,Software Development,Software Development,1,1,1,1
+2427,JavaScript,Software Development,Software Development,1,1,1,1
+2428,Java,Software Development,Software Development,1,0,0,1
+2436,Python,Software Development,Software Development,0,1,1,0
+2439,UI design,Software Development,Software Development,0,0,0,0
+2443,MySQL,Software Development,Software Development,0,1,1,0
+2444,Linux,Software Development,Software Development,0,0,0,0
+2447,CI/CD,Software Development,Software Development,0,0,0,0
+2450,Tailwind,Software Development,Software Development,0,0,0,0
+2454,Java,Software Development,Software Development,1,0,0,1
+2456,Next.js,Software Development,Software Development,0,0,0,0
+2463,Git,Software Development,Software Development,0,0,0,0
+2484,Go,Software Development,Software Development,0,0,0,0
+2489,SQL Server,Software Development,Software Development,0,0,0,0
+2495,Canva,Design,Design,0,0,0,0
+2498,PHP,Software Development,Software Development,1,1,1,1
+2501,Adobe Photoshop,Design,Design,0,1,1,1
+2504,Adobe Illustrator,Design,Design,0,1,1,1
+2511,SEO,Software Development,Software Development,0,0,0,0
+2512,CSS,Software Development,Software Development,1,1,1,1
+2517,CSS,Software Development,Software Development,1,1,1,1
+2518,Python,Software Development,Software Development,0,0,0,0
+2524,Teamwork,Design,Design,0,0,0,0
+2527,MySQL,Software Development,Software Development,0,0,0,0
+2531,Java,Software Development,Software Development,1,1,1,1
+2535,JavaScript,Software Development,Software Development,1,1,1,1
+2537,IT troubleshooting,Software Development,Software Development,0,0,0,0
+2546,Angular,Software Development,Software Development,0,0,0,0
+2550,TypeScript,Software Development,Software Development,0,0,0,0
+2556,JavaScript,Software Development,Software Development,1,1,1,1
+2557,Java,Software Development,Software Development,1,1,1,1
+2560,HTML,Software Development,Software Development,1,1,1,1
+2563,JavaScript,Software Development,Software Development,1,1,1,1
+2565,Problem solving,Software Development,Software Development,0,0,0,0
+2575,XML,Software Development,Software Development,0,0,0,0
+2581,Problem solving,Software Development,Software Development,0,0,0,0
+2592,Git,Data & AI,Data & AI,0,0,0,0
+2594,Python,Data & AI,Data & AI,0,1,1,1
+2598,TypeScript,Software Development,Software Development,0,0,0,0
+2603,XML,Software Development,Software Development,0,0,0,0
+2611,GCP,Software Development,Software Development,0,0,0,0
+2631,Python,Software Development,Software Development,0,0,0,0
+2637,Java,Software Development,Software Development,1,0,0,1
+2647,ETL,Data & AI,Software Development,0,1,0,0
+2648,Problem solving,Software Development,Infrastructure & Security,0,0,0,0
+2650,HTML,Software Development,Software Development,1,1,1,1
+2655,GraphQL,Software Development,Software Development,0,0,0,0
+2658,Android SDK,Software Development,Software Development,0,0,0,0
+2663,Node.js,Software Development,Software Development,0,0,0,0
+2665,ASP.NET,Software Development,Software Development,0,0,0,0
+2667,IT troubleshooting,Software Development,Software Development,0,0,0,0
+2668,Tailwind,Software Development,Software Development,0,0,0,0
+2673,Angular,Software Development,Software Development,0,0,0,0
+2677,Node.js,Software Development,Software Development,0,1,1,0
+2687,JavaScript,Software Development,Software Development,1,1,1,1
+2690,TensorFlow,Software Development,Data & AI,0,0,0,0
+2698,Testing,Infrastructure & Security,Infrastructure & Security,0,0,0,1
+2699,JavaScript,Software Development,Software Development,1,1,1,1
+2701,HTML,Software Development,Software Development,1,1,1,1
+2703,HTML,Software Development,Software Development,1,1,1,1
+2704,SQL,Data & AI,Data & AI,1,1,1,1
+2707,Git,Software Development,Software Development,0,0,0,0
+2711,HTML,Software Development,Software Development,1,1,1,1
+2717,Angular,Software Development,Software Development,0,0,0,0
+2718,MySQL,Software Development,Infrastructure & Security,0,0,0,0
+2723,Excel,Data & AI,Data & AI,0,0,0,0
+2725,Spring,Software Development,Software Development,0,0,0,0
+2728,ASP.NET,Software Development,Software Development,0,0,0,0
+2731,jQuery,Software Development,Software Development,0,0,0,0
+2733,C#,Software Development,Software Development,0,0,0,0
+2740,CSS,Software Development,Software Development,1,1,1,1
+2757,AWS,Data & AI,Software Development,0,0,0,0
+2758,IT troubleshooting,Infrastructure & Security,Software Development,0,1,0,0
+2762,CSS,Software Development,Software Development,1,1,1,1
+2766,HTML,Software Development,Software Development,1,1,1,1
+2775,Microservices,Software Development,Software Development,0,0,0,0
+2783,Git,Software Development,Software Development,0,0,0,0
+2784,Node.js,Software Development,Software Development,0,0,0,0
+2790,SQL,Data & AI,Data & AI,1,1,1,1
+2792,Python,Data & AI,Data & AI,0,1,1,1
+2794,Data analysis,Data & AI,Data & AI,0,1,1,1
+2817,SQL,Data & AI,Data & AI,1,1,1,1
+2827,Python,Data & AI,Data & AI,0,1,1,1
+2828,Odoo,Data & AI,Data & AI,0,0,0,0

@@ -1,0 +1,9 @@
+source,raw,mapped,recognized,unique,usage
+Indonesia Kaggle,5374,2763.0,2600.0,1762.0,local
+Web Developer,2649,2222.0,1903.0,1163.0,local
+Glints Indonesia,166,78.0,74.0,53.0,local
+International IT,10000,3796.0,3693.0,3126.0,augmentation candidate
+LinkedIn metadata,12217,,,,excluded: no skills or descriptions
+Digital gap jobs,15247,,,,excluded: template concerns
+Digital gap courses,3892,,,,reference only
+IT sentences,776,,,,vocabulary audit only

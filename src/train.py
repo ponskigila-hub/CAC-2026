@@ -1,116 +1,82 @@
-"""Rolling-origin tuning, retrospective backtests and deployment refit. Run from project root."""
-import os
-os.environ.setdefault('OMP_NUM_THREADS','2')
-os.environ.setdefault('OPENBLAS_NUM_THREADS','2')
 import json
+from collections import Counter
 import numpy as np,pandas as pd,joblib
-from sklearn.linear_model import Ridge,LogisticRegression
-from sklearn.ensemble import HistGradientBoostingRegressor,HistGradientBoostingClassifier
+from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import average_precision_score,roc_auc_score,precision_score,recall_score,f1_score,confusion_matrix
-from src.forecast import *
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score,f1_score,classification_report,confusion_matrix
+from sklearn.base import clone
+from .core import ROOT,skills,features,label,score,overlap,recommend,role
+R=ROOT/'data/raw';O=ROOT/'results'
+def prepare():
+    a=pd.read_csv(R/'all.csv.zip',sep='|');w=pd.read_excel(R/'web/Dataset_Web Developer.xlsx');g=pd.read_csv(R/'glints_job_data_with_company.csv');j=pd.read_csv(R/'JobsDataset.csv.zip');l=pd.read_csv(R/'job_postings.csv.zip');digital=pd.read_csv(R/'digital/job_postings.csv');it=pd.read_csv(R/'it/job_sentences.csv');courses=pd.read_csv(R/'digital/course_descriptions.csv')
+    local=a[a.job_function.str.contains('Komputer|Digital Marketing|Seni / Desain Kreatif',case=False,na=False)]
+    frames=[];audit=[]
+    for name,d,t,x in [('Indonesia Kaggle',local,'job_title','job_description'),('Web Developer',w,'Job_Title','Required Skills'),('Glints Indonesia',g,'title','skills'),('International IT',j,'Job Title','Description')]:
+        z=pd.DataFrame({'title':d[t].fillna(''),'text':d[x].fillna('')});z['career']=z.title.map(label);z=z[z.career.notna()].copy();mapped=len(z);z['skills']=z.text.map(skills);z['x']=z.skills.map(features);z=z[z.x.ne('')].copy();recognized=len(z);z['norm']=z.text.str.lower().str.replace(r'\W+',' ',regex=True).str.strip();z['source']=name;z=z.drop_duplicates(['career','norm']).drop_duplicates(['career','x']);frames.append(z);audit.append({'source':name,'raw':len(d),'mapped':mapped,'recognized':recognized,'unique':len(z),'usage':'local' if name!='International IT' else 'augmentation candidate'});print(audit[-1],flush=True)
+    d=pd.concat(frames[:3],ignore_index=True).drop_duplicates(['career','x']).reset_index(drop=True);d['group']=d.x;d['id']=np.arange(len(d));ext=frames[3];ext=ext[~ext.x.isin(d.x)].copy();audit.extend([{'source':'LinkedIn metadata','raw':len(l),'usage':'excluded: no skills or descriptions'},{'source':'Digital gap jobs','raw':len(digital),'usage':'excluded: template concerns'},{'source':'Digital gap courses','raw':len(courses),'usage':'reference only'},{'source':'IT sentences','raw':len(it),'usage':'vocabulary audit only'}]);pd.DataFrame(audit).to_csv(O/'data_audit.csv',index=False)
+    pd.DataFrame(Counter(s for t in it.text for s in skills(t)).most_common(),columns=['skill','count']).to_csv(O/'it_vocabulary.csv',index=False)
+    return d,ext
 
-def metric(y,s,t,phase,model,horizon='All'):
-    a=s>=t;tn,fp,fn,tp=confusion_matrix(y,a,labels=[0,1]).ravel()
-    return dict(phase=phase,model=model,horizon=horizon,n=len(y),threshold=t,AP=average_precision_score(y,s),AUC=roc_auc_score(y,s) if len(np.unique(y))==2 else np.nan,precision=precision_score(y,a,zero_division=0),recall=recall_score(y,a,zero_division=0),F1=f1_score(y,a,zero_division=0),FPR=fp/max(1,fp+tn),TP=tp,FP=fp,FN=fn,TN=tn,prevalence=np.mean(y))
-
-def choose_threshold(y,s):
-    # Precision-first is not imposed when the data cannot support it. Constrain the validation FPR.
-    y=np.asarray(y,dtype=bool);s=np.asarray(s);order=np.argsort(-s,kind='stable');ss=s[order];yy=y[order];ends=np.r_[np.flatnonzero(ss[:-1]!=ss[1:]),len(ss)-1];tp=np.cumsum(yy)[ends];fp=ends+1-tp;ok=(fp/max(1,(~y).sum())<=.1)&(ends+1>=30)
-    if not ok.any():return float(np.nextafter(ss.max(),np.inf))
-    ids=np.flatnonzero(ok);j=ids[np.argmax(tp[ids])];return float(ss[ends[j]])
-
-AUTO='Automatic (by horizon)'
-HGB='Histogram Gradient Boosting'
-BASE=['Persistence','Seasonal Naive']
-BLENDS={'HGB blend 25%':.25,'HGB blend 50%':.50,'HGB blend 75%':.75}
-def blend(p):
-    for name,w in BLENDS.items():p[name]=p.base*np.exp(w*np.log(p[HGB]/p.base))
-VAL=['2020-12-01','2021-06-01','2021-12-01','2022-06-01']
-TEST=['2022-12-01','2023-06-01','2023-12-01','2024-06-01']
-PC={'Ridge 1':('ridge',1),'Ridge 10':('ridge',10),'HGB small':('hgb',7,80,.06,2,50),'HGB standard':('hgb',15,60,.1,2,20),'HGB flexible':('hgb',31,100,.06,5,50)}
-RC={'Logistic .1':('logistic',.1),'Logistic 1':('logistic',1),**{k:v for k,v in PC.items() if k.startswith('HGB')}}
-SETS={'Momentum + horizon':['mom1','mom3','mom6','mom12','h','h2','mom6_missing','mom12_missing'],'+ volatility & trend':['mom1','mom3','mom6','mom12','vol3','trend','history','h','h2','trend_h','mom6_missing','mom12_missing'],'Full':FEATURES}
-def fit_one(p,c,risk=False,cols=FEATURES,cap=90000):
-    p=p.dropna(subset=['shock']) if risk else p
-    if len(p)>cap:p=p.sample(cap,random_state=42)
-    k,*v=c
-    if k=='ridge':m=make_pipeline(StandardScaler(),Ridge(alpha=v[0]))
-    elif k=='logistic':m=make_pipeline(StandardScaler(),LogisticRegression(C=v[0],max_iter=300))
-    else:
-        a,b,lr,l2,leaf=v;m=(HistGradientBoostingClassifier if risk else HistGradientBoostingRegressor)(max_leaf_nodes=a,max_iter=b,learning_rate=lr,l2_regularization=l2,min_samples_leaf=leaf,random_state=42,early_stopping=False)
-    return m.fit(p[cols],p.shock.astype(int) if risk else p.y.clip(-3,3))
-def groups(p):return horizon_group(p.h)
-def parts(p):return [('All',p)]+[(str(h),p[p.h==h]) for h in [1,3,6,12,24,36]]+[(g,p[groups(p)==g]) for g in GROUPS]
-def report(p,names,phase):
-    return [dict(phase=phase,model=n,horizon=h,n=len(z),MAPE=np.abs(z[n]/z.actual-1).mean()*100,RMSLE=np.sqrt(np.mean(np.log(z[n]/z.actual)**2))) for n in names for h,z in parts(p) if len(z)]
-def thresholds(p,n):
-    q=p.dropna(subset=['shock']);return {g:choose_threshold(z.shock,z[n]) if len(z)>=100 and z.shock.nunique()==2 else choose_threshold(q.shock,q[n]) for g in GROUPS for z in [q[groups(q)==g]]}
-def tv(p,t):return pd.Series(groups(p)).map(t).to_numpy()
-def risk_report(p,names,ts,phase):
-    q=p.dropna(subset=['shock']);out=[]
-    for n in names:
-        for h,z in parts(q):
-            if len(z):
-                r=metric(z.shock.to_numpy(),z[n].to_numpy(),tv(z,ts[n]),phase,n,h);r['threshold']=ts[n].get(h,np.nan);out.append(r)
-    return out
-
-def bands(p,names):
-    return {n:{g:[float(r.quantile(.1)),float(r.quantile(.9))] for g in GROUPS for z in [p[groups(p)==g]] for r in [np.log(z.actual/z[n])]} for n in names}
-def evaldata(d,o,end):
-    p=pairs(d,o,False);p=p[p.target_m<=end].copy();p['Persistence']=p.base;p['Seasonal Naive']=p.seasonal;return p
-def auto(p,policy):
-    p[AUTO]=np.nan
-    for g,n in policy.items():
-        mask=groups(p)==g;p.loc[mask,AUTO]=p.loc[mask,n]
-
-def main():
-    from sklearn.inspection import permutation_importance
-    d=prepare(pd.read_csv(ROOT/'data/raw/indonesia.csv.gz',low_memory=False));d.to_csv(ROOT/'data/processed/monthly.csv.gz',index=False,compression='gzip');vals=[];aud=[];abl=[];sampling=[]
-    for o in VAL:
-        tr=pairs(d,o);v=evaldata(d,o,2022*12+12);print('validation',o,len(tr),len(v),flush=True);aud.append(dict(phase='Validation',origin=o,training_pairs=len(tr),evaluation_pairs=len(v)))
-        for n,c in PC.items():v['p:'+n]=predict_price(fit_one(tr,c),v[FEATURES],v.base)
-        for n,c in RC.items():v['r:'+n]=fit_one(tr,c,True).predict_proba(v[FEATURES])[:,1]
-        q=v.dropna(subset=['shock'])
-        for label,cols in SETS.items():
-            pred=predict_price(fit_one(tr,PC['HGB standard'],cols=cols),v[cols],v.base) if label!='Full' else v['p:HGB standard'];score=fit_one(tr,RC['HGB standard'],True,cols).predict_proba(q[cols])[:,1] if label!='Full' else q['r:HGB standard'];abl.append(dict(origin=o,features=label,n_features=len(cols),n=len(v),MAPE=np.abs(pred/v.actual-1).mean()*100,AP=average_precision_score(q.shock,score)))
-        if o==VAL[-1]:
-            for cap in [30000,90000]:
-                m=fit_one(tr,PC['HGB standard'],cap=cap);r=fit_one(tr,RC['HGB standard'],True,cap=cap);sampling.append(dict(origin=o,pair_cap=cap,available_pairs=len(tr),MAPE=np.abs(predict_price(m,v[FEATURES],v.base)/v.actual-1).mean()*100,AP=average_precision_score(q.shock,r.predict_proba(q[FEATURES])[:,1])))
-        vals.append(v)
-    v=pd.concat(vals,ignore_index=True);pn=['p:'+n for n in PC];rn=['r:'+n for n in RC];tm=pd.DataFrame(report(v,BASE+pn,'Validation pooled'));rt={n:thresholds(v,n) for n in rn};rm=pd.DataFrame(risk_report(v,rn,rt,'Validation pooled'));tm.to_csv(ROOT/'results/tuning_price.csv',index=False);rm.to_csv(ROOT/'results/tuning_risk.csv',index=False);pd.DataFrame(abl).to_csv(ROOT/'results/ablation.csv',index=False);pd.DataFrame(sampling).to_csv(ROOT/'results/sampling_sensitivity.csv',index=False)
-    bp=lambda prefix:tm[(tm.horizon=='All')&tm.model.str.startswith('p:'+prefix)].sort_values('MAPE').iloc[0].model[2:]
-    br=lambda prefix:rm[(rm.horizon=='All')&rm.model.str.startswith('r:'+prefix)].sort_values(['recall','AP'],ascending=False).iloc[0].model[2:]
-    psel={'Ridge':bp('Ridge'),HGB:bp('HGB')};rsel={'Logistic Regression':br('Logistic'),HGB:br('HGB')};pc={n:PC[k] for n,k in psel.items()};rc={n:RC[k] for n,k in rsel.items()}
-    for n,k in psel.items():v[n]=v['p:'+k]
-    for n,k in rsel.items():v['score:'+n]=v['r:'+k]
-    blend(v);names=BASE+list(pc)+list(BLENDS);rn=['score:'+n for n in rc];rep=pd.DataFrame(report(v,names,'Validation pooled'));policy={g:rep[rep.horizon==g].sort_values('MAPE').iloc[0].model for g in GROUPS};auto(v,policy);ts={n:thresholds(v,n) for n in rn};rr=risk_report(v,rn,ts,'Validation pooled');selected=max([x for x in rr if x['horizon']=='All'],key=lambda x:(x['recall'],x['AP']))['model'];b=bands(v,names+[AUTO]);print('selection',psel,rsel,policy,selected,ts,flush=True)
-    tests=[];folds=[];riskfolds=[]
-    for o in TEST:
-        tr=pairs(d,o);te=evaldata(d,o,2025*12+12);print('test',o,len(tr),len(te),flush=True);aud.append(dict(phase='Retrospective test',origin=o,training_pairs=len(tr),evaluation_pairs=len(te)))
-        for n,c in pc.items():te[n]=predict_price(fit_one(tr,c),te[FEATURES],te.base)
-        for n,c in rc.items():te['score:'+n]=fit_one(tr,c,True).predict_proba(te[FEATURES])[:,1]
-        blend(te);auto(te,policy);folds+=report(te,names+[AUTO],o);riskfolds+=risk_report(te,rn,ts,o);tests.append(te)
-    pd.DataFrame(riskfolds).to_csv(ROOT/'results/rolling_risk.csv',index=False);te=pd.concat(tests,ignore_index=True);pd.DataFrame(report(v,names+[AUTO],'Validation pooled')+report(te,names+[AUTO],'Test 2023–2025')).to_csv(ROOT/'results/forecast_metrics.csv',index=False);pd.DataFrame(folds).to_csv(ROOT/'results/rolling_origin.csv',index=False);rr+=risk_report(te,rn,ts,'Test 2023–2025');rf=pd.DataFrame(rr);rf.model=rf.model.str.removeprefix('score:');rf.to_csv(ROOT/'results/shock_metrics.csv',index=False)
-    te['prediction']=te[AUTO];te['risk_score']=te[selected];te['alert']=te.risk_score>=tv(te,ts[selected]);te['threshold']=tv(te,ts[selected]);te[['series','origin_m','target_m','h','actual','prediction','Ridge',HGB,'base','seasonal','shock','risk_score','alert','threshold','province','commodity']].to_csv(ROOT/'results/test_predictions.csv.gz',index=False,compression='gzip')
-    coverage=[]
-    for n in names+[AUTO]:
-        for g in GROUPS:
-            z=te[groups(te)==g];lo,hi=b[n][g];e=np.log(z.actual/z[n]);coverage.append(dict(model=n,horizon=g,n=len(z),coverage=((e>=lo)&(e<=hi)).mean(),log_error_q10=lo,log_error_q90=hi))
-    pd.DataFrame(coverage).to_csv(ROOT/'results/interval_coverage.csv',index=False)
-    seg=[]
-    for col in ['commodity','province']:
-        for k,z in te.groupby(col):
-            q=z.dropna(subset=['shock']);row=metric(q.shock.to_numpy(),q.risk_score.to_numpy(),tv(q,ts[selected]),'test',selected) if len(q)>1 and q.shock.nunique()==2 else {};seg.append(dict(segment=col,value=k,n=len(z),MAPE=np.abs(z.prediction/z.actual-1).mean()*100,**{k:row.get(k,np.nan) for k in ['precision','recall','FPR','AP']}))
-    pd.DataFrame(seg).to_csv(ROOT/'results/segment_metrics.csv',index=False)
-    # Update deployment using OOF historical predictions; no independent post-2025 test exists.
-    combined=pd.concat([v,te],ignore_index=True);dt=thresholds(combined,selected);db=bands(combined,names+[AUTO]);pd.DataFrame([dict(horizon=g,validation_threshold=ts[selected][g],deployment_oof_threshold=dt[g],price_model=policy[g],validation_n=int((groups(v)==g).sum()),deployment_oof_n=int((groups(combined)==g).sum())) for g in GROUPS]).to_csv(ROOT/'results/deployment_policy.csv',index=False)
-    final=pairs(d,'2025-12-01');aud.append(dict(phase='Deployment refit',origin='2025-12-01',training_pairs=len(final),evaluation_pairs=0));pd.DataFrame(aud).to_csv(ROOT/'results/split_audit.csv',index=False);models={n:fit_one(final,c) for n,c in pc.items()};risk=fit_one(final,rc[selected[6:]],True)
-    tr=pairs(d,VAL[-1]);z=evaldata(d,VAL[-1],2022*12+12).dropna(subset=['shock']);z=z.sample(min(5000,len(z)),random_state=42);r=fit_one(tr,rc[selected[6:]],True);imp=permutation_importance(r,z[FEATURES],z.shock.astype(int),scoring='average_precision',n_repeats=3,random_state=42,n_jobs=1);pd.DataFrame({'feature':FEATURES,'AP_drop':imp.importances_mean,'std':imp.importances_std}).sort_values('AP_drop',ascending=False).to_csv(ROOT/'results/importance.csv',index=False)
-    joblib.dump(dict(price_models=models,risk_model=risk,risk_selected=selected[6:],selected=AUTO,thresholds=dt,validation_thresholds=ts[selected],price_policy=policy,price_configs=pc,risk_configs=rc,blends=BLENDS,policy='Validation horizon FPR <=10%; deployment thresholds adapted from OOF through 2025',train_end='2025-12',features=FEATURES,bands=db),ROOT/'models/forecast.joblib',compress=3)
-    bundle=joblib.load(ROOT/'models/forecast.joblib');origin,path=forecast_path(d,868,'2028-01-31',bundle);path.to_csv(ROOT/'results/example_jan2028.csv',index=False);origin.to_frame().T.to_csv(ROOT/'results/example_origin.csv',index=False)
-    print('done',flush=True)
+def pipe(e):return make_pipeline(TfidfVectorizer(lowercase=False),clone(e))
+def profiles(d):return {c:{s:n/len(g) for s,n in Counter(s for ss in g.skills for s in ss).most_common(25)} for c,g in d.groupby('career')}
+def measure(y,p,classes):
+    order=np.argsort(-p,axis=1);rank=np.array([list(classes[o]).index(v)+1 for o,v in zip(order,y)]);return {'accuracy':accuracy_score(y,classes[order[:,0]]),'macro_f1':f1_score(y,classes[order[:,0]],average='macro',zero_division=0),'top3_hit':(rank<=3).mean(),'mrr':np.mean(1/rank),'ndcg_at3':np.mean(np.where(rank<=3,1/np.log2(rank+1),0))}
+def ovmat(prof,ss,cls):
+    a=np.array([overlap(prof,s,cls) for s in ss]);return np.divide(a,a.sum(1,keepdims=True),out=np.full_like(a,1/len(cls)),where=a.sum(1,keepdims=True)>0)
+def train():
+    d,ext=prepare();tr,te=next(StratifiedGroupKFold(5,shuffle=True,random_state=42).split(d,d.career,d.group));dev=d.iloc[tr];test=d.iloc[te];d['split']='test';d.loc[tr,'split']='development';assert not set(dev.group)&set(test.group);cls=np.array(sorted(d.career.unique()));print('split',len(dev),len(test),d.career.value_counts().to_dict(),flush=True)
+    folds=list(StratifiedGroupKFold(4,shuffle=True,random_state=43).split(dev,dev.career,dev.group));candidates={'Naive Bayes':[MultinomialNB(alpha=v) for v in [.1,.5,1]],'Logistic Regression':[LogisticRegression(C=v,max_iter=500,class_weight='balanced') for v in [1,3,10]],'Linear SVM':[LinearSVC(C=v,class_weight='balanced') for v in [.3,1,3]],'Random Forest':[RandomForestClassifier(n_estimators=60,min_samples_leaf=v,random_state=42,n_jobs=2,class_weight='balanced') for v in [1,3]],'Majority baseline':[DummyClassifier(strategy='prior')]};tuning=[];chosen={};oofs={}
+    for name,opts in candidates.items():
+        best=-1
+        for est in opts:
+            oof=np.zeros((len(dev),len(cls)));fold_metrics=[]
+            for a,b in folds:
+                fit,val=dev.iloc[a],dev.iloc[b];m=pipe(est).fit(fit.x,fit.career);oof[b]=score(m,val.x);fold_metrics.append(measure(val.career,oof[b],cls)['macro_f1'])
+            met=measure(dev.career,oof,cls);tuning.append({'model':name,'parameters':str(est),**met,'fold_macro_f1_std':np.std(fold_metrics)})
+            if met['macro_f1']>best:best=met['macro_f1'];chosen[name]=est;oofs[name]=oof
+        print('tuned',name,best,flush=True)
+    base=max((k for k in chosen if k!='Majority baseline'),key=lambda k:measure(dev.career,oofs[k],cls)['macro_f1']);ov=np.zeros_like(oofs[base]);
+    for a,b in folds:ov[b]=ovmat(profiles(dev.iloc[a]),dev.iloc[b].skills,cls)
+    oofs['Skill overlap']=ov;alpha=max([0,.25,.5,.75,1],key=lambda a:measure(dev.career,a*oofs[base]+(1-a)*ov,cls)['macro_f1']);oofs['Hybrid']=alpha*oofs[base]+(1-alpha)*ov
+    for a in [0,.25,.5,.75,1]:tuning.append({'model':'Hybrid','parameters':f'alpha={a}',**measure(dev.career,a*oofs[base]+(1-a)*ov,cls)})
+    external_oof=np.zeros_like(ov)
+    for a,b in folds:
+        fit=dev.iloc[a];aug=pd.concat([fit,ext]);m=pipe(chosen[base]).fit(aug.x,aug.career);external_oof[b]=score(m,dev.iloc[b].x)
+    oofs['International augmentation']=external_oof
+    best=max((k for k in oofs if k not in ['Majority baseline','Skill overlap']),key=lambda k:measure(dev.career,oofs[k],cls)['macro_f1']);models={k:pipe(e).fit(dev.x,dev.career) for k,e in chosen.items()};aug=pd.concat([dev,ext]);models['International augmentation']=pipe(chosen[base]).fit(aug.x,aug.career);prof=profiles(dev);pr={k:score(m,test.x) for k,m in models.items()};pr['Skill overlap']=ovmat(prof,test.skills,cls);pr['Hybrid']=alpha*pr[base]+(1-alpha)*pr['Skill overlap'];rows=[];pred=test[['id','career','source']].copy();report=[]
+    for k,p in pr.items():
+        rows.append({'model':k,'split':'grouped CV',**measure(dev.career,oofs[k],cls)});rows.append({'model':k,'split':'test',**measure(test.career,p,cls)});y=cls[p.argmax(1)];pred[k]=y;cr=classification_report(test.career,y,labels=cls,output_dict=True,zero_division=0);report.extend({'model':k,'career':c,**cr[c]} for c in cls);pd.DataFrame(confusion_matrix(test.career,y,labels=cls),index=cls,columns=cls).to_csv(O/f'cm_{k}.csv')
+    sd=dev.copy();sd['specialization']=sd.title.map(role);sd=sd[sd.specialization.notna()];specs={c:profiles(g.rename(columns={'career':'field','specialization':'career'})) for c,g in sd.groupby('career')};bundle={'best':best,'models':models,'base':base,'alpha':alpha,'profiles':prof,'specializations':specs,'vocabulary':sorted(set(s for ss in dev.skills for s in ss))};joblib.dump(bundle,ROOT/'models/bundle.joblib',compress=3)
+    gc=Counter(s for ss in dev.skills for s in ss);gaprows=[]
+    for r in test.itertuples():
+        if len(r.skills)<2:continue
+        hidden=str(np.random.default_rng(42+r.id).choice(r.skills));known=set(r.skills)-{hidden};rec=recommend(bundle,list(known),best)
+        if rec.empty:continue
+        c=rec.iloc[0]['Career'];globalrank=[s for s,n in gc.most_common() if s not in known][:5];oracle=[s for s in prof[r.career] if s not in known][:5];actual=[s for s in prof[c] if s not in known][:5];gaprows.append({'id':r.id,'hidden':hidden,'actual_field':r.career,'predicted_field':c,'global_hit':int(hidden in globalrank),'oracle_hit':int(hidden in oracle),'end_to_end_hit':int(hidden in actual)})
+    pd.DataFrame(gaprows).to_csv(O/'gap_evaluation.csv',index=False)
+    robust=[]
+    for fraction in [.5,.75,1]:
+        ss=[list(np.random.default_rng(42+i).choice(s,max(1,int(np.ceil(len(s)*fraction))),replace=False)) for i,s in enumerate(test.skills)];x=[features(s) for s in ss];p=score(models[base if best=='Hybrid' else best],x);p=alpha*p+(1-alpha)*ovmat(prof,ss,cls) if best=='Hybrid' else p;robust.append({'retained_fraction':fraction,**measure(test.career,p,cls)})
+    pd.DataFrame(robust).to_csv(O/'robustness.csv',index=False)
+    rng=np.random.default_rng(42);groups=[np.array(v) for v in test.reset_index(drop=True).groupby('group').indices.values()];boot=[];yy=test.career.to_numpy();p=pr[best]
+    for _ in range(100):
+        idx=np.concatenate([groups[i] for i in rng.integers(0,len(groups),len(groups))]);boot.append(measure(yy[idx],p[idx],cls))
+    pd.DataFrame(boot).quantile([.025,.975]).to_csv(O/'bootstrap_ci.csv');pd.DataFrame(rows).to_csv(O/'metrics.csv',index=False);pd.DataFrame(tuning).to_csv(O/'tuning.csv',index=False);pd.DataFrame(report).to_csv(O/'class_report.csv',index=False);pred.to_csv(O/'test_predictions.csv',index=False)
+    d.assign(skills=d.skills.map('|'.join)).drop(columns=['text','norm']).to_csv(ROOT/'data/processed/jobs.csv',index=False);(O/'summary.json').write_text(json.dumps({'best':best,'base':base,'alpha':alpha,'development':len(dev),'test':len(test),'external':len(ext),'classes':cls.tolist(),'vocabulary':len(bundle['vocabulary'])},indent=2));print(pd.DataFrame(rows).to_string(index=False),flush=True)
 if __name__=='__main__':
-    from threadpoolctl import threadpool_limits
-    with threadpool_limits(limits=2):main()
+    train()
+    from .enhance import run
+    run()
+    from .source_audit import run as audit_sources
+    audit_sources()
+
+    from .quality import run as quality_audit
+    quality_audit()
+    from .gap_rank import run as gap_v3
+    gap_v3()

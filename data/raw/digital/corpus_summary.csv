@@ -1,0 +1,3 @@
+corpus,total_documents,average_document_length_words,sd_document_length_words,average_technical_density_pct,sd_technical_density_pct,indonesian_pct,english_pct,average_quality_score,sd_quality_score
+Job postings,15247,342.0,187.0,18.7,6.3,62.3,37.7,8.2,1.4
+Educational curricula,3892,156.0,89.0,31.4,12.1,78.9,21.1,7.9,1.6
