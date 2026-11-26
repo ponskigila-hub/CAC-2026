@@ -1,0 +1,51 @@
+method,career,training_rows
+Original Hybrid,Software Development,1652
+Original Hybrid,Digital Marketing,198
+Original Hybrid,Infrastructure & Security,176
+Original Hybrid,Data & AI,135
+Original Hybrid,Design,110
+Class weighting,Software Development,1652
+Class weighting,Digital Marketing,198
+Class weighting,Infrastructure & Security,176
+Class weighting,Data & AI,135
+Class weighting,Design,110
+Random oversampling,Data & AI,1652
+Random oversampling,Design,1652
+Random oversampling,Digital Marketing,1652
+Random oversampling,Infrastructure & Security,1652
+Random oversampling,Software Development,1652
+Random undersampling,Data & AI,110
+Random undersampling,Design,110
+Random undersampling,Digital Marketing,110
+Random undersampling,Infrastructure & Security,110
+Random undersampling,Software Development,110
+Selective augmentation,Software Development,1652
+Selective augmentation,Infrastructure & Security,796
+Selective augmentation,Data & AI,731
+Selective augmentation,Design,209
+Selective augmentation,Digital Marketing,198
+Augmentation + class weighting,Software Development,1652
+Augmentation + class weighting,Infrastructure & Security,796
+Augmentation + class weighting,Data & AI,731
+Augmentation + class weighting,Design,209
+Augmentation + class weighting,Digital Marketing,198
+Augmentation + oversampling,Data & AI,1652
+Augmentation + oversampling,Design,1652
+Augmentation + oversampling,Digital Marketing,1652
+Augmentation + oversampling,Infrastructure & Security,1652
+Augmentation + oversampling,Software Development,1652
+Augmentation + undersampling,Data & AI,198
+Augmentation + undersampling,Design,198
+Augmentation + undersampling,Digital Marketing,198
+Augmentation + undersampling,Infrastructure & Security,198
+Augmentation + undersampling,Software Development,198
+Moderate class weighting,Software Development,1652
+Moderate class weighting,Digital Marketing,198
+Moderate class weighting,Infrastructure & Security,176
+Moderate class weighting,Data & AI,135
+Moderate class weighting,Design,110
+Augmentation + moderate weighting,Software Development,1652
+Augmentation + moderate weighting,Infrastructure & Security,796
+Augmentation + moderate weighting,Data & AI,731
+Augmentation + moderate weighting,Design,209
+Augmentation + moderate weighting,Digital Marketing,198

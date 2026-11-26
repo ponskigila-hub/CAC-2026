@@ -38,7 +38,7 @@ def recommend(bundle,skills,model=None):
     known=sorted(set(skills)&set(bundle['vocabulary']));name=model or bundle['best'];m=bundle['models'][bundle['base'] if name=='Hybrid' else name];classes=m.classes_
     if not known:return pd.DataFrame(columns=['Career','Model score','Skill coverage'])
     p=score(m,[features(known)])[0];o=overlap(bundle['profiles'],known,classes)
-    if name=='Hybrid':p=bundle['alpha']*p+(1-bundle['alpha'])*(o/o.sum() if o.sum() else np.ones(len(o))/len(o))
+    if name in ('Hybrid','Balancing experiment'):p=bundle['alpha']*p+(1-bundle['alpha'])*(o/o.sum() if o.sum() else np.ones(len(o))/len(o))
     return pd.DataFrame({'Career':classes,'Model score':p,'Skill coverage':o}).sort_values('Model score',ascending=False,ignore_index=True)
 def gap(bundle,career,skills):
     return pd.DataFrame([{'Skill':s,'Demand share':v,'Have':s in skills} for s,v in bundle['profiles'][career].items()]).sort_values('Demand share',ascending=False,ignore_index=True)
