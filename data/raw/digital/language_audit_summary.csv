@@ -1,0 +1,4 @@
+stratum,n,correct,errors,accuracy_pct,reviewer_raw_agreement_pct
+Overall,500,470,30,94.0,97.4
+Job postings,350,336,14,96.0,96.9
+Educational course descriptions,150,134,16,89.3,98.7

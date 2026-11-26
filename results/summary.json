@@ -1,0 +1,16 @@
+{
+  "best": "Hybrid",
+  "base": "Naive Bayes",
+  "alpha": 0.5,
+  "development": 2271,
+  "test": 567,
+  "external": 2995,
+  "classes": [
+    "Data & AI",
+    "Design",
+    "Digital Marketing",
+    "Infrastructure & Security",
+    "Software Development"
+  ],
+  "vocabulary": 111
+}

@@ -1,0 +1,548 @@
+program_id,program_name,institution_id,institution_type
+PRG0001,Bachelor in Computer Science,UNI001,Public University
+PRG0002,Diploma in Information Systems,UNI002,Public University
+PRG0003,Diploma in Information Technology,UNI003,Public University
+PRG0004,Master in Software Engineering,UNI004,Public University
+PRG0005,Bachelor in Data Science,UNI005,Public University
+PRG0006,Bachelor in Cybersecurity,UNI006,Public University
+PRG0007,Master in Digital Business,UNI007,Public University
+PRG0008,Bachelor in Computer Engineering,UNI008,Public University
+PRG0009,Bachelor in Business Analytics,UNI009,Public University
+PRG0010,Bachelor in Network Technology,UNI010,Public University
+PRG0011,Professional Certificate in Artificial Intelligence,UNI011,Public University
+PRG0012,Professional Certificate in Multimedia Computing,UNI012,Public University
+PRG0013,Bachelor in Informatics,UNI013,Private University
+PRG0014,Bachelor in Computer Science,UNI014,Private University
+PRG0015,Bachelor in Information Systems,UNI015,Private University
+PRG0016,Diploma in Information Technology,UNI016,Private University
+PRG0017,Bachelor in Software Engineering,UNI017,Private University
+PRG0018,Professional Certificate in Data Science,UNI018,Private University
+PRG0019,Master in Cybersecurity,UNI019,Private University
+PRG0020,Bachelor in Digital Business,UNI020,Private University
+PRG0021,Bachelor in Computer Engineering,UNI021,Private University
+PRG0022,Professional Certificate in Business Analytics,UNI022,Private University
+PRG0023,Bachelor in Network Technology,UNI023,Private University
+PRG0024,Professional Certificate in Artificial Intelligence,UNI024,Private University
+PRG0025,Professional Certificate in Multimedia Computing,UNI025,Private University
+PRG0026,Diploma in Informatics,UNI026,Private University
+PRG0027,Diploma in Computer Science,UNI027,Private University
+PRG0028,Master in Information Systems,UNI028,Polytechnic
+PRG0029,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0030,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0031,Bachelor in Data Science,UNI031,Polytechnic
+PRG0032,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0033,Diploma in Digital Business,UNI033,Polytechnic
+PRG0034,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0035,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0036,Diploma in Network Technology,ELP002,E-learning Platform
+PRG0037,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0038,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0039,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0040,Bachelor in Computer Science,UNI001,Public University
+PRG0041,Bachelor in Information Systems,UNI002,Public University
+PRG0042,Diploma in Information Technology,UNI003,Public University
+PRG0043,Bachelor in Software Engineering,UNI004,Public University
+PRG0044,Diploma in Data Science,UNI005,Public University
+PRG0045,Bachelor in Cybersecurity,UNI006,Public University
+PRG0046,Diploma in Digital Business,UNI007,Public University
+PRG0047,Bachelor in Computer Engineering,UNI008,Public University
+PRG0048,Master in Business Analytics,UNI009,Public University
+PRG0049,Bachelor in Network Technology,UNI010,Public University
+PRG0050,Diploma in Artificial Intelligence,UNI011,Public University
+PRG0051,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0052,Bachelor in Informatics,UNI013,Private University
+PRG0053,Bachelor in Computer Science,UNI014,Private University
+PRG0054,Bachelor in Information Systems,UNI015,Private University
+PRG0055,Diploma in Information Technology,UNI016,Private University
+PRG0056,Master in Software Engineering,UNI017,Private University
+PRG0057,Bachelor in Data Science,UNI018,Private University
+PRG0058,Bachelor in Cybersecurity,UNI019,Private University
+PRG0059,Master in Digital Business,UNI020,Private University
+PRG0060,Master in Computer Engineering,UNI021,Private University
+PRG0061,Master in Business Analytics,UNI022,Private University
+PRG0062,Bachelor in Network Technology,UNI023,Private University
+PRG0063,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0064,Diploma in Multimedia Computing,UNI025,Private University
+PRG0065,Bachelor in Informatics,UNI026,Private University
+PRG0066,Bachelor in Computer Science,UNI027,Private University
+PRG0067,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0068,Professional Certificate in Information Technology,UNI029,Polytechnic
+PRG0069,Master in Software Engineering,UNI030,Polytechnic
+PRG0070,Bachelor in Data Science,UNI031,Polytechnic
+PRG0071,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0072,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0073,Professional Certificate in Computer Engineering,UNI034,Polytechnic
+PRG0074,Professional Certificate in Business Analytics,ELP001,E-learning Platform
+PRG0075,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0076,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0077,Master in Multimedia Computing,ELP004,E-learning Platform
+PRG0078,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0079,Bachelor in Computer Science,UNI001,Public University
+PRG0080,Bachelor in Information Systems,UNI002,Public University
+PRG0081,Bachelor in Information Technology,UNI003,Public University
+PRG0082,Bachelor in Software Engineering,UNI004,Public University
+PRG0083,Professional Certificate in Data Science,UNI005,Public University
+PRG0084,Bachelor in Cybersecurity,UNI006,Public University
+PRG0085,Master in Digital Business,UNI007,Public University
+PRG0086,Bachelor in Computer Engineering,UNI008,Public University
+PRG0087,Bachelor in Business Analytics,UNI009,Public University
+PRG0088,Bachelor in Network Technology,UNI010,Public University
+PRG0089,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0090,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0091,Professional Certificate in Informatics,UNI013,Private University
+PRG0092,Bachelor in Computer Science,UNI014,Private University
+PRG0093,Bachelor in Information Systems,UNI015,Private University
+PRG0094,Bachelor in Information Technology,UNI016,Private University
+PRG0095,Bachelor in Software Engineering,UNI017,Private University
+PRG0096,Professional Certificate in Data Science,UNI018,Private University
+PRG0097,Bachelor in Cybersecurity,UNI019,Private University
+PRG0098,Bachelor in Digital Business,UNI020,Private University
+PRG0099,Bachelor in Computer Engineering,UNI021,Private University
+PRG0100,Master in Business Analytics,UNI022,Private University
+PRG0101,Bachelor in Network Technology,UNI023,Private University
+PRG0102,Professional Certificate in Artificial Intelligence,UNI024,Private University
+PRG0103,Professional Certificate in Multimedia Computing,UNI025,Private University
+PRG0104,Bachelor in Informatics,UNI026,Private University
+PRG0105,Bachelor in Computer Science,UNI027,Private University
+PRG0106,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0107,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0108,Master in Software Engineering,UNI030,Polytechnic
+PRG0109,Professional Certificate in Data Science,UNI031,Polytechnic
+PRG0110,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0111,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0112,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0113,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0114,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0115,Professional Certificate in Artificial Intelligence,ELP003,E-learning Platform
+PRG0116,Master in Multimedia Computing,ELP004,E-learning Platform
+PRG0117,Professional Certificate in Informatics,ELP005,E-learning Platform
+PRG0118,Master in Computer Science,UNI001,Public University
+PRG0119,Bachelor in Information Systems,UNI002,Public University
+PRG0120,Professional Certificate in Information Technology,UNI003,Public University
+PRG0121,Bachelor in Software Engineering,UNI004,Public University
+PRG0122,Bachelor in Data Science,UNI005,Public University
+PRG0123,Bachelor in Cybersecurity,UNI006,Public University
+PRG0124,Master in Digital Business,UNI007,Public University
+PRG0125,Bachelor in Computer Engineering,UNI008,Public University
+PRG0126,Bachelor in Business Analytics,UNI009,Public University
+PRG0127,Professional Certificate in Network Technology,UNI010,Public University
+PRG0128,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0129,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0130,Professional Certificate in Informatics,UNI013,Private University
+PRG0131,Professional Certificate in Computer Science,UNI014,Private University
+PRG0132,Bachelor in Information Systems,UNI015,Private University
+PRG0133,Bachelor in Information Technology,UNI016,Private University
+PRG0134,Bachelor in Software Engineering,UNI017,Private University
+PRG0135,Diploma in Data Science,UNI018,Private University
+PRG0136,Bachelor in Cybersecurity,UNI019,Private University
+PRG0137,Diploma in Digital Business,UNI020,Private University
+PRG0138,Master in Computer Engineering,UNI021,Private University
+PRG0139,Bachelor in Business Analytics,UNI022,Private University
+PRG0140,Bachelor in Network Technology,UNI023,Private University
+PRG0141,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0142,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0143,Diploma in Informatics,UNI026,Private University
+PRG0144,Bachelor in Computer Science,UNI027,Private University
+PRG0145,Professional Certificate in Information Systems,UNI028,Polytechnic
+PRG0146,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0147,Professional Certificate in Software Engineering,UNI030,Polytechnic
+PRG0148,Bachelor in Data Science,UNI031,Polytechnic
+PRG0149,Master in Cybersecurity,UNI032,Polytechnic
+PRG0150,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0151,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0152,Master in Business Analytics,ELP001,E-learning Platform
+PRG0153,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0154,Diploma in Artificial Intelligence,ELP003,E-learning Platform
+PRG0155,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0156,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0157,Bachelor in Computer Science,UNI001,Public University
+PRG0158,Bachelor in Information Systems,UNI002,Public University
+PRG0159,Master in Information Technology,UNI003,Public University
+PRG0160,Bachelor in Software Engineering,UNI004,Public University
+PRG0161,Master in Data Science,UNI005,Public University
+PRG0162,Professional Certificate in Cybersecurity,UNI006,Public University
+PRG0163,Professional Certificate in Digital Business,UNI007,Public University
+PRG0164,Bachelor in Computer Engineering,UNI008,Public University
+PRG0165,Bachelor in Business Analytics,UNI009,Public University
+PRG0166,Master in Network Technology,UNI010,Public University
+PRG0167,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0168,Master in Multimedia Computing,UNI012,Public University
+PRG0169,Bachelor in Informatics,UNI013,Private University
+PRG0170,Bachelor in Computer Science,UNI014,Private University
+PRG0171,Bachelor in Information Systems,UNI015,Private University
+PRG0172,Bachelor in Information Technology,UNI016,Private University
+PRG0173,Diploma in Software Engineering,UNI017,Private University
+PRG0174,Professional Certificate in Data Science,UNI018,Private University
+PRG0175,Bachelor in Cybersecurity,UNI019,Private University
+PRG0176,Diploma in Digital Business,UNI020,Private University
+PRG0177,Bachelor in Computer Engineering,UNI021,Private University
+PRG0178,Diploma in Business Analytics,UNI022,Private University
+PRG0179,Bachelor in Network Technology,UNI023,Private University
+PRG0180,Master in Artificial Intelligence,UNI024,Private University
+PRG0181,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0182,Bachelor in Informatics,UNI026,Private University
+PRG0183,Master in Computer Science,UNI027,Private University
+PRG0184,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0185,Diploma in Information Technology,UNI029,Polytechnic
+PRG0186,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0187,Diploma in Data Science,UNI031,Polytechnic
+PRG0188,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0189,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0190,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0191,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0192,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0193,Professional Certificate in Artificial Intelligence,ELP003,E-learning Platform
+PRG0194,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0195,Master in Informatics,ELP005,E-learning Platform
+PRG0196,Professional Certificate in Computer Science,UNI001,Public University
+PRG0197,Bachelor in Information Systems,UNI002,Public University
+PRG0198,Diploma in Information Technology,UNI003,Public University
+PRG0199,Diploma in Software Engineering,UNI004,Public University
+PRG0200,Master in Data Science,UNI005,Public University
+PRG0201,Bachelor in Cybersecurity,UNI006,Public University
+PRG0202,Bachelor in Digital Business,UNI007,Public University
+PRG0203,Bachelor in Computer Engineering,UNI008,Public University
+PRG0204,Diploma in Business Analytics,UNI009,Public University
+PRG0205,Master in Network Technology,UNI010,Public University
+PRG0206,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0207,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0208,Bachelor in Informatics,UNI013,Private University
+PRG0209,Bachelor in Computer Science,UNI014,Private University
+PRG0210,Bachelor in Information Systems,UNI015,Private University
+PRG0211,Bachelor in Information Technology,UNI016,Private University
+PRG0212,Diploma in Software Engineering,UNI017,Private University
+PRG0213,Bachelor in Data Science,UNI018,Private University
+PRG0214,Professional Certificate in Cybersecurity,UNI019,Private University
+PRG0215,Bachelor in Digital Business,UNI020,Private University
+PRG0216,Bachelor in Computer Engineering,UNI021,Private University
+PRG0217,Bachelor in Business Analytics,UNI022,Private University
+PRG0218,Bachelor in Network Technology,UNI023,Private University
+PRG0219,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0220,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0221,Bachelor in Informatics,UNI026,Private University
+PRG0222,Master in Computer Science,UNI027,Private University
+PRG0223,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0224,Master in Information Technology,UNI029,Polytechnic
+PRG0225,Diploma in Software Engineering,UNI030,Polytechnic
+PRG0226,Diploma in Data Science,UNI031,Polytechnic
+PRG0227,Master in Cybersecurity,UNI032,Polytechnic
+PRG0228,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0229,Master in Computer Engineering,UNI034,Polytechnic
+PRG0230,Diploma in Business Analytics,ELP001,E-learning Platform
+PRG0231,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0232,Professional Certificate in Artificial Intelligence,ELP003,E-learning Platform
+PRG0233,Diploma in Multimedia Computing,ELP004,E-learning Platform
+PRG0234,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0235,Bachelor in Computer Science,UNI001,Public University
+PRG0236,Bachelor in Information Systems,UNI002,Public University
+PRG0237,Diploma in Information Technology,UNI003,Public University
+PRG0238,Bachelor in Software Engineering,UNI004,Public University
+PRG0239,Diploma in Data Science,UNI005,Public University
+PRG0240,Bachelor in Cybersecurity,UNI006,Public University
+PRG0241,Bachelor in Digital Business,UNI007,Public University
+PRG0242,Professional Certificate in Computer Engineering,UNI008,Public University
+PRG0243,Master in Business Analytics,UNI009,Public University
+PRG0244,Bachelor in Network Technology,UNI010,Public University
+PRG0245,Master in Artificial Intelligence,UNI011,Public University
+PRG0246,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0247,Diploma in Informatics,UNI013,Private University
+PRG0248,Bachelor in Computer Science,UNI014,Private University
+PRG0249,Diploma in Information Systems,UNI015,Private University
+PRG0250,Bachelor in Information Technology,UNI016,Private University
+PRG0251,Bachelor in Software Engineering,UNI017,Private University
+PRG0252,Bachelor in Data Science,UNI018,Private University
+PRG0253,Bachelor in Cybersecurity,UNI019,Private University
+PRG0254,Bachelor in Digital Business,UNI020,Private University
+PRG0255,Bachelor in Computer Engineering,UNI021,Private University
+PRG0256,Master in Business Analytics,UNI022,Private University
+PRG0257,Bachelor in Network Technology,UNI023,Private University
+PRG0258,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0259,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0260,Bachelor in Informatics,UNI026,Private University
+PRG0261,Bachelor in Computer Science,UNI027,Private University
+PRG0262,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0263,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0264,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0265,Professional Certificate in Data Science,UNI031,Polytechnic
+PRG0266,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0267,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0268,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0269,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0270,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0271,Professional Certificate in Artificial Intelligence,ELP003,E-learning Platform
+PRG0272,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0273,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0274,Professional Certificate in Computer Science,UNI001,Public University
+PRG0275,Bachelor in Information Systems,UNI002,Public University
+PRG0276,Bachelor in Information Technology,UNI003,Public University
+PRG0277,Bachelor in Software Engineering,UNI004,Public University
+PRG0278,Bachelor in Data Science,UNI005,Public University
+PRG0279,Bachelor in Cybersecurity,UNI006,Public University
+PRG0280,Bachelor in Digital Business,UNI007,Public University
+PRG0281,Bachelor in Computer Engineering,UNI008,Public University
+PRG0282,Master in Business Analytics,UNI009,Public University
+PRG0283,Bachelor in Network Technology,UNI010,Public University
+PRG0284,Master in Artificial Intelligence,UNI011,Public University
+PRG0285,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0286,Bachelor in Informatics,UNI013,Private University
+PRG0287,Bachelor in Computer Science,UNI014,Private University
+PRG0288,Bachelor in Information Systems,UNI015,Private University
+PRG0289,Bachelor in Information Technology,UNI016,Private University
+PRG0290,Professional Certificate in Software Engineering,UNI017,Private University
+PRG0291,Bachelor in Data Science,UNI018,Private University
+PRG0292,Diploma in Cybersecurity,UNI019,Private University
+PRG0293,Diploma in Digital Business,UNI020,Private University
+PRG0294,Diploma in Computer Engineering,UNI021,Private University
+PRG0295,Bachelor in Business Analytics,UNI022,Private University
+PRG0296,Master in Network Technology,UNI023,Private University
+PRG0297,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0298,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0299,Professional Certificate in Informatics,UNI026,Private University
+PRG0300,Professional Certificate in Computer Science,UNI027,Private University
+PRG0301,Diploma in Information Systems,UNI028,Polytechnic
+PRG0302,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0303,Professional Certificate in Software Engineering,UNI030,Polytechnic
+PRG0304,Master in Data Science,UNI031,Polytechnic
+PRG0305,Professional Certificate in Cybersecurity,UNI032,Polytechnic
+PRG0306,Master in Digital Business,UNI033,Polytechnic
+PRG0307,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0308,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0309,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0310,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0311,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0312,Diploma in Informatics,ELP005,E-learning Platform
+PRG0313,Professional Certificate in Computer Science,UNI001,Public University
+PRG0314,Bachelor in Information Systems,UNI002,Public University
+PRG0315,Diploma in Information Technology,UNI003,Public University
+PRG0316,Bachelor in Software Engineering,UNI004,Public University
+PRG0317,Bachelor in Data Science,UNI005,Public University
+PRG0318,Bachelor in Cybersecurity,UNI006,Public University
+PRG0319,Master in Digital Business,UNI007,Public University
+PRG0320,Diploma in Computer Engineering,UNI008,Public University
+PRG0321,Professional Certificate in Business Analytics,UNI009,Public University
+PRG0322,Master in Network Technology,UNI010,Public University
+PRG0323,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0324,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0325,Professional Certificate in Informatics,UNI013,Private University
+PRG0326,Bachelor in Computer Science,UNI014,Private University
+PRG0327,Bachelor in Information Systems,UNI015,Private University
+PRG0328,Bachelor in Information Technology,UNI016,Private University
+PRG0329,Master in Software Engineering,UNI017,Private University
+PRG0330,Bachelor in Data Science,UNI018,Private University
+PRG0331,Bachelor in Cybersecurity,UNI019,Private University
+PRG0332,Bachelor in Digital Business,UNI020,Private University
+PRG0333,Bachelor in Computer Engineering,UNI021,Private University
+PRG0334,Bachelor in Business Analytics,UNI022,Private University
+PRG0335,Bachelor in Network Technology,UNI023,Private University
+PRG0336,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0337,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0338,Diploma in Informatics,UNI026,Private University
+PRG0339,Bachelor in Computer Science,UNI027,Private University
+PRG0340,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0341,Professional Certificate in Information Technology,UNI029,Polytechnic
+PRG0342,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0343,Bachelor in Data Science,UNI031,Polytechnic
+PRG0344,Diploma in Cybersecurity,UNI032,Polytechnic
+PRG0345,Diploma in Digital Business,UNI033,Polytechnic
+PRG0346,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0347,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0348,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0349,Master in Artificial Intelligence,ELP003,E-learning Platform
+PRG0350,Diploma in Multimedia Computing,ELP004,E-learning Platform
+PRG0351,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0352,Bachelor in Computer Science,UNI001,Public University
+PRG0353,Bachelor in Information Systems,UNI002,Public University
+PRG0354,Bachelor in Information Technology,UNI003,Public University
+PRG0355,Master in Software Engineering,UNI004,Public University
+PRG0356,Master in Data Science,UNI005,Public University
+PRG0357,Bachelor in Cybersecurity,UNI006,Public University
+PRG0358,Bachelor in Digital Business,UNI007,Public University
+PRG0359,Professional Certificate in Computer Engineering,UNI008,Public University
+PRG0360,Diploma in Business Analytics,UNI009,Public University
+PRG0361,Bachelor in Network Technology,UNI010,Public University
+PRG0362,Professional Certificate in Artificial Intelligence,UNI011,Public University
+PRG0363,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0364,Bachelor in Informatics,UNI013,Private University
+PRG0365,Professional Certificate in Computer Science,UNI014,Private University
+PRG0366,Bachelor in Information Systems,UNI015,Private University
+PRG0367,Bachelor in Information Technology,UNI016,Private University
+PRG0368,Professional Certificate in Software Engineering,UNI017,Private University
+PRG0369,Master in Data Science,UNI018,Private University
+PRG0370,Bachelor in Cybersecurity,UNI019,Private University
+PRG0371,Master in Digital Business,UNI020,Private University
+PRG0372,Bachelor in Computer Engineering,UNI021,Private University
+PRG0373,Bachelor in Business Analytics,UNI022,Private University
+PRG0374,Bachelor in Network Technology,UNI023,Private University
+PRG0375,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0376,Diploma in Multimedia Computing,UNI025,Private University
+PRG0377,Bachelor in Informatics,UNI026,Private University
+PRG0378,Master in Computer Science,UNI027,Private University
+PRG0379,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0380,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0381,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0382,Diploma in Data Science,UNI031,Polytechnic
+PRG0383,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0384,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0385,Master in Computer Engineering,UNI034,Polytechnic
+PRG0386,Master in Business Analytics,ELP001,E-learning Platform
+PRG0387,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0388,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0389,Master in Multimedia Computing,ELP004,E-learning Platform
+PRG0390,Diploma in Informatics,ELP005,E-learning Platform
+PRG0391,Master in Computer Science,UNI001,Public University
+PRG0392,Bachelor in Information Systems,UNI002,Public University
+PRG0393,Professional Certificate in Information Technology,UNI003,Public University
+PRG0394,Bachelor in Software Engineering,UNI004,Public University
+PRG0395,Bachelor in Data Science,UNI005,Public University
+PRG0396,Professional Certificate in Cybersecurity,UNI006,Public University
+PRG0397,Bachelor in Digital Business,UNI007,Public University
+PRG0398,Professional Certificate in Computer Engineering,UNI008,Public University
+PRG0399,Diploma in Business Analytics,UNI009,Public University
+PRG0400,Professional Certificate in Network Technology,UNI010,Public University
+PRG0401,Master in Artificial Intelligence,UNI011,Public University
+PRG0402,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0403,Master in Informatics,UNI013,Private University
+PRG0404,Professional Certificate in Computer Science,UNI014,Private University
+PRG0405,Master in Information Systems,UNI015,Private University
+PRG0406,Bachelor in Information Technology,UNI016,Private University
+PRG0407,Diploma in Software Engineering,UNI017,Private University
+PRG0408,Bachelor in Data Science,UNI018,Private University
+PRG0409,Professional Certificate in Cybersecurity,UNI019,Private University
+PRG0410,Bachelor in Digital Business,UNI020,Private University
+PRG0411,Bachelor in Computer Engineering,UNI021,Private University
+PRG0412,Bachelor in Business Analytics,UNI022,Private University
+PRG0413,Bachelor in Network Technology,UNI023,Private University
+PRG0414,Professional Certificate in Artificial Intelligence,UNI024,Private University
+PRG0415,Master in Multimedia Computing,UNI025,Private University
+PRG0416,Diploma in Informatics,UNI026,Private University
+PRG0417,Bachelor in Computer Science,UNI027,Private University
+PRG0418,Diploma in Information Systems,UNI028,Polytechnic
+PRG0419,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0420,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0421,Bachelor in Data Science,UNI031,Polytechnic
+PRG0422,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0423,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0424,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0425,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0426,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0427,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0428,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0429,Diploma in Informatics,ELP005,E-learning Platform
+PRG0430,Professional Certificate in Computer Science,UNI001,Public University
+PRG0431,Bachelor in Information Systems,UNI002,Public University
+PRG0432,Bachelor in Information Technology,UNI003,Public University
+PRG0433,Bachelor in Software Engineering,UNI004,Public University
+PRG0434,Bachelor in Data Science,UNI005,Public University
+PRG0435,Professional Certificate in Cybersecurity,UNI006,Public University
+PRG0436,Bachelor in Digital Business,UNI007,Public University
+PRG0437,Diploma in Computer Engineering,UNI008,Public University
+PRG0438,Bachelor in Business Analytics,UNI009,Public University
+PRG0439,Bachelor in Network Technology,UNI010,Public University
+PRG0440,Bachelor in Artificial Intelligence,UNI011,Public University
+PRG0441,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0442,Bachelor in Informatics,UNI013,Private University
+PRG0443,Master in Computer Science,UNI014,Private University
+PRG0444,Bachelor in Information Systems,UNI015,Private University
+PRG0445,Professional Certificate in Information Technology,UNI016,Private University
+PRG0446,Bachelor in Software Engineering,UNI017,Private University
+PRG0447,Bachelor in Data Science,UNI018,Private University
+PRG0448,Diploma in Cybersecurity,UNI019,Private University
+PRG0449,Bachelor in Digital Business,UNI020,Private University
+PRG0450,Diploma in Computer Engineering,UNI021,Private University
+PRG0451,Diploma in Business Analytics,UNI022,Private University
+PRG0452,Master in Network Technology,UNI023,Private University
+PRG0453,Master in Artificial Intelligence,UNI024,Private University
+PRG0454,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0455,Bachelor in Informatics,UNI026,Private University
+PRG0456,Bachelor in Computer Science,UNI027,Private University
+PRG0457,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0458,Diploma in Information Technology,UNI029,Polytechnic
+PRG0459,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0460,Bachelor in Data Science,UNI031,Polytechnic
+PRG0461,Professional Certificate in Cybersecurity,UNI032,Polytechnic
+PRG0462,Master in Digital Business,UNI033,Polytechnic
+PRG0463,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0464,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0465,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0466,Diploma in Artificial Intelligence,ELP003,E-learning Platform
+PRG0467,Master in Multimedia Computing,ELP004,E-learning Platform
+PRG0468,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0469,Bachelor in Computer Science,UNI001,Public University
+PRG0470,Bachelor in Information Systems,UNI002,Public University
+PRG0471,Professional Certificate in Information Technology,UNI003,Public University
+PRG0472,Bachelor in Software Engineering,UNI004,Public University
+PRG0473,Bachelor in Data Science,UNI005,Public University
+PRG0474,Diploma in Cybersecurity,UNI006,Public University
+PRG0475,Bachelor in Digital Business,UNI007,Public University
+PRG0476,Bachelor in Computer Engineering,UNI008,Public University
+PRG0477,Bachelor in Business Analytics,UNI009,Public University
+PRG0478,Master in Network Technology,UNI010,Public University
+PRG0479,Diploma in Artificial Intelligence,UNI011,Public University
+PRG0480,Bachelor in Multimedia Computing,UNI012,Public University
+PRG0481,Diploma in Informatics,UNI013,Private University
+PRG0482,Diploma in Computer Science,UNI014,Private University
+PRG0483,Bachelor in Information Systems,UNI015,Private University
+PRG0484,Bachelor in Information Technology,UNI016,Private University
+PRG0485,Master in Software Engineering,UNI017,Private University
+PRG0486,Bachelor in Data Science,UNI018,Private University
+PRG0487,Bachelor in Cybersecurity,UNI019,Private University
+PRG0488,Bachelor in Digital Business,UNI020,Private University
+PRG0489,Bachelor in Computer Engineering,UNI021,Private University
+PRG0490,Master in Business Analytics,UNI022,Private University
+PRG0491,Diploma in Network Technology,UNI023,Private University
+PRG0492,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0493,Diploma in Multimedia Computing,UNI025,Private University
+PRG0494,Bachelor in Informatics,UNI026,Private University
+PRG0495,Bachelor in Computer Science,UNI027,Private University
+PRG0496,Diploma in Information Systems,UNI028,Polytechnic
+PRG0497,Master in Information Technology,UNI029,Polytechnic
+PRG0498,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0499,Master in Data Science,UNI031,Polytechnic
+PRG0500,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0501,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0502,Bachelor in Computer Engineering,UNI034,Polytechnic
+PRG0503,Bachelor in Business Analytics,ELP001,E-learning Platform
+PRG0504,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0505,Bachelor in Artificial Intelligence,ELP003,E-learning Platform
+PRG0506,Bachelor in Multimedia Computing,ELP004,E-learning Platform
+PRG0507,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0508,Master in Computer Science,UNI001,Public University
+PRG0509,Professional Certificate in Information Systems,UNI002,Public University
+PRG0510,Master in Information Technology,UNI003,Public University
+PRG0511,Bachelor in Software Engineering,UNI004,Public University
+PRG0512,Bachelor in Data Science,UNI005,Public University
+PRG0513,Bachelor in Cybersecurity,UNI006,Public University
+PRG0514,Bachelor in Digital Business,UNI007,Public University
+PRG0515,Bachelor in Computer Engineering,UNI008,Public University
+PRG0516,Professional Certificate in Business Analytics,UNI009,Public University
+PRG0517,Bachelor in Network Technology,UNI010,Public University
+PRG0518,Professional Certificate in Artificial Intelligence,UNI011,Public University
+PRG0519,Master in Multimedia Computing,UNI012,Public University
+PRG0520,Bachelor in Informatics,UNI013,Private University
+PRG0521,Diploma in Computer Science,UNI014,Private University
+PRG0522,Professional Certificate in Information Systems,UNI015,Private University
+PRG0523,Bachelor in Information Technology,UNI016,Private University
+PRG0524,Bachelor in Software Engineering,UNI017,Private University
+PRG0525,Bachelor in Data Science,UNI018,Private University
+PRG0526,Bachelor in Cybersecurity,UNI019,Private University
+PRG0527,Bachelor in Digital Business,UNI020,Private University
+PRG0528,Bachelor in Computer Engineering,UNI021,Private University
+PRG0529,Master in Business Analytics,UNI022,Private University
+PRG0530,Bachelor in Network Technology,UNI023,Private University
+PRG0531,Bachelor in Artificial Intelligence,UNI024,Private University
+PRG0532,Bachelor in Multimedia Computing,UNI025,Private University
+PRG0533,Bachelor in Informatics,UNI026,Private University
+PRG0534,Bachelor in Computer Science,UNI027,Private University
+PRG0535,Bachelor in Information Systems,UNI028,Polytechnic
+PRG0536,Bachelor in Information Technology,UNI029,Polytechnic
+PRG0537,Bachelor in Software Engineering,UNI030,Polytechnic
+PRG0538,Bachelor in Data Science,UNI031,Polytechnic
+PRG0539,Bachelor in Cybersecurity,UNI032,Polytechnic
+PRG0540,Bachelor in Digital Business,UNI033,Polytechnic
+PRG0541,Professional Certificate in Computer Engineering,UNI034,Polytechnic
+PRG0542,Master in Business Analytics,ELP001,E-learning Platform
+PRG0543,Bachelor in Network Technology,ELP002,E-learning Platform
+PRG0544,Master in Artificial Intelligence,ELP003,E-learning Platform
+PRG0545,Master in Multimedia Computing,ELP004,E-learning Platform
+PRG0546,Bachelor in Informatics,ELP005,E-learning Platform
+PRG0547,Master in Computer Science,UNI001,Public University
