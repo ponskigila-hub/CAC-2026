@@ -1,0 +1,13 @@
+{
+  "selected": "Original Hybrid",
+  "alternative": "Moderate class weighting",
+  "augmentation_profiles": 1315,
+  "augmentation_counts": {
+    "Infrastructure & Security": 620,
+    "Data & AI": 596,
+    "Design": 99
+  },
+  "development": 2271,
+  "test": 567,
+  "note": "Retrospective comparison; original test already used in earlier work. Select on grouped CV only. Demand profiles remain original local development."
+}
