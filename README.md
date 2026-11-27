@@ -18,7 +18,7 @@ SkillBridge membantu mahasiswa, fresh graduate, dan pencari kerja mengeksplorasi
 
 ### Live demo (Streamlit)
 
-**Deployment URL:** `https://<your-streamlit-app>.streamlit.app/`
+**Deployment URL:** `https://skillbridge-penaklukfcmobile.streamlit.app/`
 
 Placeholder: replace this URL with the actual public Streamlit deployment link after deployment. The local setup below is available independently of the hosted demo.
 
@@ -287,5 +287,4 @@ SkillBridge/
 ├── results/               # Experiment tables and audits
 ├── src/                   # Preprocessing, training and inference
 ├── tests/                 # Automated tests
-└── docs/                  # Technical documentation
 ```
