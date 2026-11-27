@@ -20,7 +20,7 @@ SkillBridge membantu mahasiswa, fresh graduate, dan pencari kerja mengeksplorasi
 
 **Deployment URL:** `https://skillbridge-penaklukfcmobile.streamlit.app/`
 
-Placeholder: replace this URL with the actual public Streamlit deployment link after deployment. The local setup below is available independently of the hosted demo.
+URL yang disediakan tim; akses publik belum terverifikasi. Demo lokal tersedia melalui instruksi di bawah. Repository ini mencakup penelitian, Jupyter Notebook dan Streamlit dalam satu paket. Untuk hosting, gunakan file yang diperlukan sesuai [panduan deployment](docs/DEPLOYMENT.md), setelah izin redistribusi dipastikan.
 
 ### Dua jalur penggunaan
 
@@ -31,7 +31,7 @@ Placeholder: replace this URL with the actual public Streamlit deployment link a
 
 Kedua jalur menggunakan pipeline `src/`, data dan model pretrained yang sama; bukan dua model yang dilatih terpisah. Notebook secara default membaca artefak penelitian; opsi training ulang tersedia. Pilih salah satu jalur setelah instalasi environment berikut.
 
-**Prasyarat:** Python 3.11–3.13 (disarankan 3.13; scikit-learn 1.8.0), terminal, dan koneksi internet saat instalasi dependency. Tidak diperlukan GPU, API key, database, atau training ulang untuk demo.
+**Prasyarat:** Python 3.12 (referensi instalasi bersih), dengan pipeline juga diuji pada Python 3.13.5; scikit-learn 1.8.0 dan Streamlit 1.51.x, terminal, dan koneksi internet saat instalasi dependency. Tidak diperlukan GPU, API key, database, atau training ulang untuk demo.
 
 Ekstrak arsip, masuk ke folder `SkillBridge` yang berisi `app.py`, lalu jalankan:
 
@@ -77,11 +77,11 @@ Buka `notebooks/SkillBridge.ipynb`, pilih kernel **Python (SkillBridge)**, lalu 
 
 | Menu | Isi dan cara menggunakan |
 |---|---|
-| Overview | Latar belakang, tujuan, SDG dan ringkasan hasil. Klik **Explore my career** untuk demo langsung. |
+| Overview | Latar belakang, tujuan, SDG dan ringkasan hasil. Klik **Mulai rekomendasi karier** untuk demo langsung. |
 | EDA | Distribusi keluarga karier, keterampilan dan sumber data. Perhatikan ketimpangan kelas. |
 | Preprocessing | Pipeline ekstraksi skill, label, deduplikasi dan pembagian data. |
-| Training & Testing | Pilih model; bandingkan accuracy, Macro F1, balanced accuracy, confusion matrix dan eksperimen balancing. |
-| Prediction | Pilih preset **Data**, atau masukkan Python, SQL, Pandas, Statistics dan Power BI. Lihat tiga rekomendasi, pilih bidang, lalu eksplorasi skill gap, spesialisasi, learning simulator dan penjelasan skor. |
+| Training & Testing | Pilih model; bandingkan accuracy, Macro F1, balanced accuracy, confusion matrix, eksperimen balancing, paired bootstrap dan nested CV. |
+| Prediction | Pilih preset **Data**, atau masukkan Python, SQL, Pandas, Statistics dan Power BI. Lihat tiga rekomendasi, pilih bidang, lalu eksplorasi skill gap, spesialisasi, learning simulator, learning topics dan penjelasan skor. |
 
 Navigasi menggunakan sidebar dan tombol Previous/Next. Pada Prediction, pengaturan algoritma berada di **Additional input and model settings**. Default adalah Hybrid; `Balancing experiment` adalah alternatif moderate class weighting. Hasil ranking dapat diunduh sebagai CSV.
 
@@ -138,7 +138,7 @@ Pada menu EDA, pilih profil lokal, kandidat augmentasi minoritas, atau gabungan 
 | [IT Job Posts Descriptions](https://www.kaggle.com/datasets/mscgeorges/itjobpostdescriptions) | 10.000 deskripsi IT | Eksperimen augmentasi internasional |
 | [IT Job Description Role Classification](https://data.mendeley.com/datasets/btf562prk5/1) | 10.461 deskripsi; 2.102 kandidat minoritas sebelum filter | Eksperimen augmentasi selektif; Software Development baru dikeluarkan |
 | [Data Science Job Postings & Skills](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills) | 12.217 metadata pada file yang tersedia | Tidak untuk training: tidak ada deskripsi/skill |
-| [Mapping the Digital Skills Gap](https://zenodo.org/records/21803444) | 15.247 lowongan dan 3.892 kursus | Audit pola template; kursus sebagai referensi, tidak untuk training |
+| [Mapping the Digital Skills Gap](https://zenodo.org/records/21803444) | 15.247 lowongan dan 3.892 kursus | Audit pola template; metadata kursus untuk rekomendasi topik, bukan training classifier |
 | [IT Job Skill Requirements](https://data.mendeley.com/datasets/zzy8v7ggkz/3) | 776 kalimat | Audit vocabulary |
 
 | Sumber lokal | Setelah filter awal | Label dikenali | Skill dikenali | Unik dalam sumber |
@@ -147,7 +147,11 @@ Pada menu EDA, pilih profil lokal, kandidat augmentasi minoritas, atau gabungan 
 | Web Developer | 2.649 | 2.222 | 1.903 | 1.163 |
 | Glints Indonesia | 166 | 78 | 74 | 53 |
 
-Deduplikasi lintas sumber menghasilkan 2.838 pasangan label–profil skill lokal. Nilai missing ditangani sebagai teks kosong; baris tanpa label atau keterampilan yang dikenali dikeluarkan. Deskripsi berpola sangat seragam tidak dipakai untuk training; hal ini merupakan kehati-hatian kualitas, bukan bukti bahwa data tersebut sintetis. Audit dan hash input tersedia pada `results/data_audit.csv`, `results/balance_data_audit.csv`, dan `results/input_manifest.csv`. Lisensi tambahan masih harus diverifikasi sebelum redistribusi; lihat [Data Sources](docs/DATA_SOURCES.md).
+Deduplikasi lintas sumber menghasilkan 2.838 pasangan label–profil skill lokal. Nilai missing ditangani sebagai teks kosong; baris tanpa label atau keterampilan yang dikenali dikeluarkan. Deskripsi berpola sangat seragam tidak dipakai untuk training; hal ini merupakan kehati-hatian kualitas, bukan bukti bahwa data tersebut sintetis. Audit dan hash input tersedia pada `results/data_audit.csv`, `results/balance_data_audit.csv`, dan `results/input_manifest.csv`. Lisensi lima sumber Mendeley/Zenodo telah dicek pada halaman penerbit; lisensi tiga sumber Kaggle belum terverifikasi. Lihat [Data Sources](docs/DATA_SOURCES.md) untuk atribusi, lisensi, dan persyaratan redistribusi.
+
+### Audit kualitas label dan informasi skill
+
+Sebanyak 57 grup skill identik memiliki label keluarga berbeda, mencakup **127 dari 2.838 profil (4,48%)**. Sebanyak **449 profil (15,82%)** memiliki paling banyak dua keterampilan. Kedua temuan penting karena label dibangun dari regex judul, sedangkan input hanya memuat keterampilan. Akurasi classifier mengukur kesepakatan terhadap label tersebut, bukan terhadap penilaian manusia independen. Ringkasan dapat diperiksa pada `results/profile_quality_summary.csv`. Protokol review independen dua penilai atas 90 profil test terdapat pada [Review Protocol](docs/REVIEW_PROTOCOL.md); hasil manusia belum tersedia.
 
 ## 5. Metodologi
 
@@ -227,7 +231,7 @@ Nilai tabel classifier berada pada skala 0–1. Berikut perbandingan metode bala
 | Random oversampling | 89,59% | 83,20% | 91,10% |
 | Random undersampling | 87,65% | 80,63% | 89,32% |
 
-Hasil pada 567 profil test lokal. Hybrid unggul pada development Macro F1 (81,33% dibanding 79,93% untuk moderate weighting), sehingga tetap menjadi default. Moderate weighting meningkatkan recall Infrastructure & Security dari 72,09% menjadi 83,72%, dengan trade-off precision dan accuracy. Majority baseline accuracy adalah 72,84%; karena itu Macro F1, balanced accuracy dan evaluasi per kelas menjadi penting.
+Hasil pada 567 profil test lokal. Hybrid unggul pada development Macro F1 (81,33% dibanding 79,93% untuk moderate weighting), sehingga tetap menjadi default. Moderate weighting meningkatkan recall Infrastructure & Security dari 72,09% menjadi 83,72% (31 menjadi 36 dari 43 profil), dengan trade-off precision dan accuracy. Majority baseline accuracy adalah 72,84%; karena itu Macro F1, balanced accuracy dan evaluasi per kelas menjadi penting.
 
 Hybrid Top-3 Hit Rate 99,65%, MRR 0,9644 dan NDCG@3 0,9721. Top-3 mencakup tiga dari lima keluarga, bukan tiga lowongan individual. Audit kemiripan skill dengan development pada ambang Jaccard 0,8 menyisakan 512 profil test dengan accuracy 92,77%. Evaluasi ini bersifat retrospektif, bukan test independen baru.
 
@@ -246,6 +250,28 @@ Rekomendasi skill end-to-end (542 profil dengan satu skill disembunyikan): Hit@5
 Software Development mencakup 72,8% profil lokal, sehingga accuracy saja tidak cukup. Infrastructure & Security memiliki recall terendah (72,09%, 43 sampel test). Moderate weighting memperbaiki recall minoritas tetapi menurunkan Macro F1; karena itu Hybrid tetap menjadi default. Pada audit source-held-out, accuracy Kaggle Indonesia 88,37%, Web Developer 94,97%, dan Glints 71,43% (hanya tujuh sampel). Saat separuh skill dipertahankan, accuracy 90,48% dan Macro F1 82,17%. Group bootstrap 100 replikasi menghasilkan interval empiris 95% accuracy 91,07–95,38% dan Macro F1 82,71–90,83%. Seluruh audit menggunakan data historis, bukan validasi pengguna independen.
 
 Hasil lengkap tersedia dalam `results/metrics.csv`, `results/class_report.csv`, `results/balance_metrics.csv`, `results/balance_class_report.csv` dan notebook.
+
+### Perbandingan statistik berpasangan
+
+Paired group bootstrap menggunakan 1.000 replikasi (seed 42), dengan resampling grup yang sama untuk semua metode. Tabel menyatakan selisih Macro F1 Hybrid dikurangi pembanding dalam percentage points (pp), disertai interval persentil 95% tanpa koreksi multiple comparisons. Ini adalah analisis eksploratif pada holdout historis.
+
+| Pembanding | Selisih Macro F1 (pp) | 95% CI (pp) |
+|---|---:|---:|
+| Naive Bayes | +2,19 | −0,19 hingga +4,81 |
+| Linear SVM | +1,02 | −1,71 hingga +3,62 |
+| Random Forest | +3,87 | −0,35 hingga +7,80 |
+| Logistic Regression | +5,82 | +2,23 hingga +9,68 |
+| Skill overlap | +13,92 | +10,00 hingga +17,84 |
+
+Interval yang mencakup nol tidak membuktikan perbedaan, maupun kesetaraan. Hybrid dipertahankan berdasarkan development CV, bukan klaim superioritas statistik terhadap semua model. Moderate weighting dibanding Hybrid memberikan kenaikan balanced accuracy 2,45 pp (95% CI: +0,38 hingga +4,99 pp), tetapi selisih Macro F1 tidak meyakinkan. Hasil lengkap: `results/paired_model_ci.csv`, `results/paired_balance_ci.csv`, `results/balance_test_predictions.csv`, dan `results/test_predictions.csv` (termasuk Balancing experiment).
+
+### Nested grouped cross-validation
+
+Empat outer folds dan tiga inner folds digunakan pada 2.271 profil development. Pencarian terbatas pada Naive Bayes, Linear SVM, serta bobot hybrid; setiap outer validation fold tidak digunakan untuk memilih parameter. Pooled accuracy **90,71%**, Macro F1 **81,61%**, balanced accuracy **81,43%**, dan Top-3 Hit **99,21%**. Hasil ini tidak menggantikan holdout temporal baru atau validasi manusia. Data dan label masih historis; estimasi menggambarkan prosedur tuning terbatas. Detail: `results/nested_cv.csv` dan `results/nested_cv_predictions.csv`.
+
+### Rekomendasi topik pembelajaran
+
+Katalog historis memuat 3.892 baris, 55 judul unik, dan 11 pola technology focus. Deduplikasi title–focus dan ekstraksi skill menghasilkan 40 pasangan yang dapat dicocokkan, mencakup 15 skill. Sebanyak 192 dari 542 skill yang disembunyikan (35,42%) tercakup dalam katalog; angka ini mengukur cakupan katalog, bukan kualitas kursus. Sistem mencocokkan skill yang belum dimiliki dengan metadata katalog, lalu mengurutkan topik berdasarkan jumlah skor prioritas skill yang cocok. Rekomendasi bukan klaim ketersediaan kursus saat ini atau hasil belajar. Jika tidak ada kecocokan, sistem menampilkan keadaan kosong secara eksplisit. Audit: `results/course_audit.csv`; katalog: `data/processed/learning_topics.csv`. Fitur tersedia pada notebook dan tab **Learning topics** di Streamlit.
 
 ### Cakupan interpretasi hasil
 
@@ -271,7 +297,7 @@ python -m src.balance
 python -m unittest discover -s tests -v
 ```
 
-Jalankan kedua perintah training secara berurutan untuk membangun kembali seluruh bundle, termasuk model balancing. Restart Streamlit setelah training ulang. Panduan server, deployment dan troubleshooting: [Deployment](docs/DEPLOYMENT.md). Checklist pengujian: [Validation](docs/VALIDATION.md).
+Jalankan kedua perintah training secara berurutan untuk membangun kembali seluruh bundle, termasuk model balancing, paired bootstrap, nested CV, dan katalog topik belajar. Restart Streamlit setelah training ulang. Panduan server, deployment dan troubleshooting: [Deployment](docs/DEPLOYMENT.md). Checklist pengujian: [Validation](docs/VALIDATION.md).
 
 ## 8. Struktur proyek
 
@@ -280,6 +306,9 @@ SkillBridge/
 ├── app.py                 # Streamlit entry point
 ├── requirements.txt       # Python dependencies
 ├── .streamlit/            # UI theme
+├── config/                # Alias dan aturan label dalam JSON
+├── docs/                  # Metodologi, sumber, deployment dan review
+├── review/                # Form review manusia dan pengujian pengguna
 ├── data/raw/              # Source datasets for reproduction
 ├── data/processed/        # Model-ready profiles
 ├── models/                # Pretrained model bundle
@@ -288,3 +317,7 @@ SkillBridge/
 ├── src/                   # Preprocessing, training and inference
 ├── tests/                 # Automated tests
 ```
+
+## 9. Validasi independen
+
+Untuk melakukan review label: isi `review/reviewer_a.csv` dan `review/reviewer_b.csv` secara independen, lalu jalankan `python -m src.review_labels --evaluate`. Lihat [Review Protocol](docs/REVIEW_PROTOCOL.md) untuk metode sampling, agreement, Cohen’s kappa dan perbandingan model terhadap konsensus manusia. Form `review/user_feedback.csv` disediakan untuk pengujian pengguna nyata; tidak ada data survei simulasi.

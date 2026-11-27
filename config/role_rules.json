@@ -1,0 +1,22 @@
+[
+  [
+    "Data & AI",
+    "data (analyst|scientist|engineer|architect)|machine learning|\\bmlops\\b|business intelligence|big data|data analytics"
+  ],
+  [
+    "Infrastructure & Security",
+    "devops|cloud (engineer|architect)|network (engineer|administrator)|system[s]? administrator|security (engineer|analyst)|cybersecurity|database administrator|\\bdba\\b|it support|technical support"
+  ],
+  [
+    "Design",
+    "graphic design|ui[/ ]?ux|ux designer|ui designer|visual design|desain grafis"
+  ],
+  [
+    "Digital Marketing",
+    "digital market|seo specialist|social media specialist|performance market"
+  ],
+  [
+    "Software Development",
+    "developer|programmer|software engineer|frontend|backend|front.end|back.end|full.stack|software development|software tester|software quality assurance"
+  ]
+]

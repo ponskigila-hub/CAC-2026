@@ -1,0 +1,335 @@
+{
+  "Python": [
+    "python"
+  ],
+  "Java": [
+    "java"
+  ],
+  "JavaScript": [
+    "javascript",
+    "java script",
+    "js"
+  ],
+  "TypeScript": [
+    "typescript"
+  ],
+  "C#": [
+    "c#",
+    "c sharp"
+  ],
+  "C++": [
+    "c++"
+  ],
+  "PHP": [
+    "php"
+  ],
+  "Go": [
+    "golang",
+    "go language"
+  ],
+  "Ruby": [
+    "ruby"
+  ],
+  "Kotlin": [
+    "kotlin"
+  ],
+  "Swift": [
+    "swift"
+  ],
+  "Dart": [
+    "dart"
+  ],
+  "HTML": [
+    "html5",
+    "html"
+  ],
+  "CSS": [
+    "css3",
+    "css"
+  ],
+  "React": [
+    "react.js",
+    "reactjs",
+    "react js",
+    "react"
+  ],
+  "React Native": [
+    "react native"
+  ],
+  "Vue": [
+    "vue.js",
+    "vuejs",
+    "vue js",
+    "vue"
+  ],
+  "Angular": [
+    "angularjs",
+    "angular js",
+    "angular"
+  ],
+  "Next.js": [
+    "next.js",
+    "nextjs"
+  ],
+  "Node.js": [
+    "node.js",
+    "nodejs",
+    "node js"
+  ],
+  "Express": [
+    "express.js",
+    "expressjs"
+  ],
+  "Laravel": [
+    "laravel"
+  ],
+  "Django": [
+    "django"
+  ],
+  "Flask": [
+    "flask"
+  ],
+  "Spring": [
+    "spring boot",
+    "spring framework",
+    "spring"
+  ],
+  "ASP.NET": [
+    "asp.net",
+    ".net",
+    "dotnet"
+  ],
+  "Flutter": [
+    "flutter"
+  ],
+  "Android SDK": [
+    "android sdk"
+  ],
+  "iOS SDK": [
+    "ios sdk"
+  ],
+  "SQL": [
+    "sql"
+  ],
+  "MySQL": [
+    "mysql"
+  ],
+  "PostgreSQL": [
+    "postgresql",
+    "postgres"
+  ],
+  "MongoDB": [
+    "mongodb",
+    "mongo db"
+  ],
+  "Redis": [
+    "redis"
+  ],
+  "SQL Server": [
+    "sql server",
+    "mssql"
+  ],
+  "Oracle": [
+    "oracle"
+  ],
+  "REST API": [
+    "restful api",
+    "rest api",
+    "restful",
+    "rest apis",
+    "rest"
+  ],
+  "GraphQL": [
+    "graphql"
+  ],
+  "Git": [
+    "github",
+    "gitlab",
+    "git"
+  ],
+  "Docker": [
+    "docker"
+  ],
+  "Kubernetes": [
+    "kubernetes",
+    "k8s"
+  ],
+  "AWS": [
+    "amazon web services",
+    "aws"
+  ],
+  "Azure": [
+    "azure"
+  ],
+  "GCP": [
+    "google cloud",
+    "gcp"
+  ],
+  "Linux": [
+    "linux"
+  ],
+  "CI/CD": [
+    "ci/cd",
+    "continuous integration",
+    "continuous delivery"
+  ],
+  "Jenkins": [
+    "jenkins"
+  ],
+  "Microservices": [
+    "microservices",
+    "microservice"
+  ],
+  "Agile": [
+    "agile",
+    "scrum"
+  ],
+  "Testing": [
+    "unit testing",
+    "software testing",
+    "automated testing",
+    "selenium",
+    "junit",
+    "testing"
+  ],
+  "Figma": [
+    "figma"
+  ],
+  "Adobe Photoshop": [
+    "photoshop"
+  ],
+  "Adobe Illustrator": [
+    "illustrator"
+  ],
+  "Adobe InDesign": [
+    "indesign"
+  ],
+  "UI design": [
+    "user interface design",
+    "ui design"
+  ],
+  "UX research": [
+    "user research",
+    "ux research"
+  ],
+  "Prototyping": [
+    "prototyping",
+    "wireframe",
+    "wireframing"
+  ],
+  "SEO": [
+    "seo",
+    "search engine optimization"
+  ],
+  "SEM": [
+    "sem",
+    "search engine marketing"
+  ],
+  "Google Analytics": [
+    "google analytics"
+  ],
+  "Google Ads": [
+    "google ads",
+    "adwords"
+  ],
+  "Social media": [
+    "social media"
+  ],
+  "Content marketing": [
+    "content marketing"
+  ],
+  "Copywriting": [
+    "copywriting"
+  ],
+  "Meta Ads": [
+    "facebook ads",
+    "meta ads"
+  ],
+  "Excel": [
+    "excel"
+  ],
+  "Power BI": [
+    "power bi"
+  ],
+  "Tableau": [
+    "tableau"
+  ],
+  "Pandas": [
+    "pandas"
+  ],
+  "Machine learning": [
+    "machine learning"
+  ],
+  "TensorFlow": [
+    "tensorflow"
+  ],
+  "PyTorch": [
+    "pytorch"
+  ],
+  "Spark": [
+    "apache spark",
+    "spark"
+  ],
+  "Airflow": [
+    "apache airflow",
+    "airflow"
+  ],
+  "ETL": [
+    "etl"
+  ],
+  "Data modeling": [
+    "data modeling",
+    "data modelling"
+  ],
+  "WordPress": [
+    "wordpress"
+  ],
+  "jQuery": [
+    "jquery"
+  ],
+  "Bootstrap": [
+    "bootstrap"
+  ],
+  "Tailwind": [
+    "tailwind"
+  ],
+  "Firebase": [
+    "firebase"
+  ],
+  "XML": [
+    "xml"
+  ],
+  "JSON": [
+    "json"
+  ],
+  "Jira": [
+    "jira"
+  ],
+  "Odoo": [
+    "odoo"
+  ],
+  "SAP": [
+    "sap"
+  ],
+  "Cybersecurity": [
+    "cybersecurity",
+    "cyber security"
+  ],
+  "Networking": [
+    "networking",
+    "tcp/ip"
+  ],
+  "Communication": [
+    "communication skills",
+    "komunikasi"
+  ],
+  "Teamwork": [
+    "teamwork",
+    "team work",
+    "kerja sama tim"
+  ],
+  "Problem solving": [
+    "problem solving",
+    "problem-solving"
+  ]
+}

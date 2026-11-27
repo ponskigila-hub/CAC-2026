@@ -1,0 +1,80 @@
+{
+  "Data & AI": [
+    [
+      "Data science",
+      "data scientist|machine learning engineer|ai engineer"
+    ],
+    [
+      "Data engineering",
+      "data engineer|data architect|big data"
+    ],
+    [
+      "Data analytics",
+      "data analyst|data analytics|business intelligence|bi analyst"
+    ]
+  ],
+  "Infrastructure & Security": [
+    [
+      "Cybersecurity",
+      "cyber\\s*security|security (engineer|analyst)|penetration tester"
+    ],
+    [
+      "Cloud & DevOps",
+      "devops|cloud (engineer|architect)"
+    ],
+    [
+      "Network & systems",
+      "network|system[s]? administrator|database administrator|\\bdba\\b|it support|technical support"
+    ]
+  ],
+  "Design": [
+    [
+      "Graphic design",
+      "graphic design|desain grafis|visual design"
+    ],
+    [
+      "UI/UX",
+      "ui[/ ]?ux|ux designer|ui designer"
+    ]
+  ],
+  "Digital Marketing": [
+    [
+      "Digital marketing",
+      "digital market|digital advertis|performance market"
+    ],
+    [
+      "SEO",
+      "\\bseo\\b"
+    ],
+    [
+      "Social media",
+      "social media"
+    ]
+  ],
+  "Software Development": [
+    [
+      "Full-stack",
+      "full[\\s-]*stack"
+    ],
+    [
+      "Front-end",
+      "front[\\s-]*end|react developer|angular developer|vue developer"
+    ],
+    [
+      "Back-end",
+      "back[\\s-]*end|php developer|java developer|golang developer"
+    ],
+    [
+      "Mobile",
+      "\\bmobile\\b|android|\\bios\\b|flutter|react native"
+    ],
+    [
+      "QA & testing",
+      "software tester|software quality assurance"
+    ],
+    [
+      "General software",
+      "web developer|web programmer|programmer|software engineer|software developer|developer"
+    ]
+  ]
+}

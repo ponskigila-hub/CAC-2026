@@ -1,0 +1,28 @@
+reference,comparison,metric,difference_pp,ci_low_pp,ci_high_pp,excludes_zero,replicates
+Original Hybrid,Class weighting,accuracy,4.761904761904767,2.6453862061256372,7.017543859649122,True,1000
+Original Hybrid,Class weighting,macro_f1,4.8252911555459965,1.5082788711186614,8.133129919335524,True,1000
+Original Hybrid,Class weighting,balanced_accuracy,-3.4986784336410004,-7.116806834990566,-0.5210781476946541,True,1000
+Original Hybrid,Random oversampling,accuracy,3.703703703703709,1.7730496453900786,5.674263648065417,True,1000
+Original Hybrid,Random oversampling,macro_f1,4.033522954243196,0.9421496461072307,6.928055245040697,True,1000
+Original Hybrid,Random oversampling,balanced_accuracy,-3.123375770202741,-6.547317380980082,-0.47194179744549974,True,1000
+Original Hybrid,Random undersampling,accuracy,5.64373897707231,3.6649214659685847,7.801418439716312,True,1000
+Original Hybrid,Random undersampling,macro_f1,6.599244741126508,3.5010817849012126,9.684772442357227,True,1000
+Original Hybrid,Random undersampling,balanced_accuracy,-1.340617732024918,-4.133488778162788,0.9321796812376221,False,1000
+Original Hybrid,Selective augmentation,accuracy,0.881834215167554,-0.528169014084501,2.2927689594356204,False,1000
+Original Hybrid,Selective augmentation,macro_f1,0.9199243136046142,-1.6735233557936455,3.2960492605991014,False,1000
+Original Hybrid,Selective augmentation,balanced_accuracy,-2.398954350077742,-4.990936464500901,-0.14999791986585997,True,1000
+Original Hybrid,Augmentation + class weighting,accuracy,3.1746031746031744,1.2367491166077826,5.291473521562017,True,1000
+Original Hybrid,Augmentation + class weighting,macro_f1,3.9305611695086284,0.8518952336161253,7.477255135880305,True,1000
+Original Hybrid,Augmentation + class weighting,balanced_accuracy,-2.5376783773315204,-5.870624343585917,0.4126147155313671,False,1000
+Original Hybrid,Augmentation + oversampling,accuracy,3.1746031746031744,1.2411347517730538,5.142072295075776,True,1000
+Original Hybrid,Augmentation + oversampling,macro_f1,4.440468628310635,1.2905499849292774,7.736870769325941,True,1000
+Original Hybrid,Augmentation + oversampling,balanced_accuracy,-1.4551286842181765,-4.323485880436687,1.117681228675951,False,1000
+Original Hybrid,Augmentation + undersampling,accuracy,4.056437389770728,2.123893805309729,6.194964852821188,True,1000
+Original Hybrid,Augmentation + undersampling,macro_f1,5.688503886981677,2.230546060978311,9.310719203908002,True,1000
+Original Hybrid,Augmentation + undersampling,balanced_accuracy,-0.212096981982679,-3.6634784034279075,3.1717307069710947,False,1000
+Original Hybrid,Moderate class weighting,accuracy,0.7054673721340388,-0.7042564026132092,2.087506686024304,False,1000
+Original Hybrid,Moderate class weighting,macro_f1,0.6940499275969847,-1.4898772352115295,2.8530394648382433,False,1000
+Original Hybrid,Moderate class weighting,balanced_accuracy,-2.4473805001987925,-4.9937863409638314,-0.3843188051395672,True,1000
+Original Hybrid,Augmentation + moderate weighting,accuracy,2.2927689594356315,0.7004947766769162,3.9031914893617,True,1000
+Original Hybrid,Augmentation + moderate weighting,macro_f1,2.9791434234785474,0.2858798767885058,5.934153641572794,True,1000
+Original Hybrid,Augmentation + moderate weighting,balanced_accuracy,-1.6972594348234948,-4.375572910652953,0.7750438750191737,False,1000
