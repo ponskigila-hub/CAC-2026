@@ -3,15 +3,24 @@ import pandas as pd
 import streamlit as st
 from src.core import ROOT, load, recommend, gap, skills as extract, explain, overlap, learning_rank
 
-st.set_page_config(page_title='SkillBridge AI', page_icon='🎯', layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(page_title='SkillBridge', page_icon='🎯', layout='wide', initial_sidebar_state='expanded')
 st.markdown('''<style>
-.block-container {max-width: 1180px; padding-top: 2.1rem; padding-bottom: 3rem;}
-[data-testid="stSidebar"] {border-right: 1px solid rgba(100,116,139,.17);}
-[data-testid="stSidebar"] [data-testid="stRadio"] label {padding: .35rem .45rem; border-radius: .55rem;}
-[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {background: rgba(37,99,235,.08);}
-[data-testid="stMetric"] {border: 1px solid rgba(100,116,139,.18); border-radius: .85rem; padding: .8rem 1rem;}
-[data-testid="stMetricValue"] {font-size: 1.65rem;}
-h1 {letter-spacing: -.035em;} h2,h3 {letter-spacing: -.018em;}
+.block-container {max-width: 1240px; padding: 4.5rem 2.5rem 3rem;}
+[data-testid="stSidebar"] {border-right: 1px solid #dbe4ee;}
+[data-testid="stSidebar"] [data-testid="stSidebarContent"] {padding-top: 1rem;}
+[data-testid="stSidebar"] button {justify-content: flex-start; text-align: left; border-radius: 8px; min-height: 2.65rem; font-weight: 550;}
+[data-testid="stSidebar"] button p {font-size: .91rem; width:100%; text-align:left;}
+[data-testid="stSidebar"] button[kind="secondary"] {background: transparent; border:1px solid transparent; color:#334155;}
+[data-testid="stSidebar"] button[kind="secondary"]:hover {background:#e2eaf4; color:#1d4ed8;}
+[data-testid="stMetric"] {background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding: .85rem 1rem;}
+[data-testid="stMetricValue"] {font-size:1.65rem; font-weight:650;}
+[data-testid="stMetricLabel"] p {font-size:.84rem; color:#475569;}
+h1 {font-size:2.15rem!important; line-height:1.22!important; letter-spacing:-.035em; padding:.15rem 0 .45rem!important;}
+h2 {font-size:1.45rem!important; letter-spacing:-.02em;} h3 {font-size:1.16rem!important;}
+[data-testid="stMarkdownContainer"] p {line-height:1.65;}
+[data-testid="stCaptionContainer"] p {line-height:1.5; color:#64748b;}
+[data-testid="stVerticalBlockBorderWrapper"] {border-color:#e2e8f0;}
+@media(max-width: 700px){.block-container {padding:4rem 1rem 2rem;} h1 {font-size:1.65rem!important;}}
 </style>''', unsafe_allow_html=True)
 
 @st.cache_resource
@@ -27,6 +36,10 @@ def data():
 def result(name):
     return pd.read_csv(ROOT/'results'/f'{name}.csv')
 
+@st.cache_data
+def result_profiles():
+    return pd.read_csv(ROOT/'data/processed/balance_augmentation.csv')
+
 b=bundle(); d,m,s=data()
 opts=[k for k in b['models'] if k!='Majority baseline']+['Hybrid']
 best=b['best']; r=m[(m.model==best)&(m.split=='test')].iloc[0]
@@ -37,7 +50,7 @@ def go(page):
     st.session_state.page=page
 
 def heading(k,title,subtitle):
-    st.caption(f'SKILLBRIDGE  /  {pages.index(k)+1:02d} OF 05')
+    st.caption(f'{pages.index(k)+1:02d} / 05  ·  {labels[k][4:]}')
     st.title(title)
     st.caption(subtitle)
 
@@ -48,49 +61,90 @@ def footer(page):
     if i<4: c.button(pages[i+1]+' →',on_click=go,args=(pages[i+1],),key='next_'+page,use_container_width=True)
 
 with st.sidebar:
-    st.markdown('## SkillBridge AI')
-    st.caption('Career & skill intelligence')
+    st.markdown('### SkillBridge')
+    st.caption('Career intelligence · Indonesia')
     st.divider()
     st.caption('RESEARCH WORKFLOW')
-    page=st.radio('Navigation',pages,format_func=lambda p:labels[p],key='page',label_visibility='collapsed')
+    for item in pages:
+        st.button(labels[item], key='nav_'+item, type='primary' if st.session_state.page==item else 'secondary', use_container_width=True, on_click=go, args=(item,))
     st.divider()
-    st.button('Start career demo',type='primary',use_container_width=True,on_click=go,args=('Prediction',))
-    st.caption('SDG 4.4 · SDG 8.5')
-    st.caption('Indonesia · Research prototype')
+    st.caption('SUSTAINABLE DEVELOPMENT GOALS')
+    st.markdown('**04** Quality Education  \n**08** Decent Work & Economic Growth')
+    st.divider()
+    st.caption('MLSC 2026 · PenaklukFCMobile')
+page=st.session_state.page
 
 if page=='Overview':
-    heading(page,'Bridge your skills. Discover your career.','Career exploration grounded in historical Indonesian job advertisements.')
-    st.button('Explore my career',type='primary',on_click=go,args=('Prediction',))
-    a,c,e=st.columns(3); a.metric('Unique local profiles',len(d));c.metric('Career fields',len(s['classes']));e.metric('Macro F1 · test',f'{r.macro_f1:.1%}')
-    st.subheader('Latar belakang')
-    st.write('Ketidaksesuaian keterampilan dengan kebutuhan industri menyulitkan pencari kerja menentukan jalur pengembangan kompetensi. SkillBridge menggunakan lowongan historis Indonesia untuk membantu eksplorasi keluarga karier digital dan menyusun prioritas belajar.')
-    st.markdown('[Konteks: Kemnaker](https://www.kemnaker.go.id/)')
-    st.subheader('Rumusan masalah dan tujuan')
-    st.write('Apakah profil keterampilan dapat mengidentifikasi keluarga pekerjaan? Apakah model ML dan hybrid mengungguli baseline? Apakah rekomendasi skill dapat memulihkan skill yang disembunyikan?')
+    heading(page,'SkillBridge','Rekomendasi karier dan pengembangan keterampilan berbasis data lowongan Indonesia.')
+    a,c,e=st.columns(3); a.metric('Profil lokal',f'{len(d):,}');c.metric('Keluarga karier',len(s['classes']));e.metric('Macro F1 · test',f'{r.macro_f1:.2%}')
+    with st.container(border=True):
+        st.subheader('Temukan arah karier Anda')
+        st.write('Pilih keterampilan yang sudah dimiliki, jelajahi bidang karier, dan susun prioritas pembelajaran yang relevan.')
+        st.button('Mulai rekomendasi karier',type='primary',on_click=go,args=('Prediction',))
+    st.subheader('Latar belakang dan relevansi')
+    st.write('Ketidaksesuaian keterampilan dengan kebutuhan industri menyulitkan mahasiswa, fresh graduate, dan pencari kerja dalam menentukan jalur pengembangan kompetensi. SkillBridge memetakan keterampilan dari lowongan historis Indonesia untuk membantu eksplorasi karier digital.')
+    st.markdown('[Kementerian Ketenagakerjaan RI](https://www.kemnaker.go.id/)')
+    st.subheader('Tujuan penelitian')
+    st.markdown('1. Mengidentifikasi keluarga karier berdasarkan profil keterampilan.\n2. Membandingkan model ML, hybrid dan baseline serta strategi class imbalance.\n3. Menghasilkan rekomendasi skill dan simulasi cakupan kompetensi.')
+    st.subheader('Sustainable Development Goals')
     a,c=st.columns(2)
     with a:
-        st.markdown('**SDG 4.4 · Quality Education**');st.write('Keterampilan relevan untuk pekerjaan.')
+        with st.container(border=True):
+            st.markdown('**SDG 4 · Quality Education**'); st.caption('Target 4.4'); st.write('Mendukung pengembangan keterampilan teknis dan vokasional melalui analisis skill gap dan prioritas belajar.'); st.markdown('[Tujuan 4](https://sdgs.un.org/goals/goal4)')
     with c:
-        st.markdown('**SDG 8.5 · Decent Work**');st.write('Kesempatan kerja produktif.')
-    st.info('Historical research prototype. Not a live job board or a measure of hiring success.')
+        with st.container(border=True):
+            st.markdown('**SDG 8 · Decent Work and Economic Growth**'); st.caption('Target 8.5'); st.write('Mendukung eksplorasi jalur karier dan kesiapan kompetensi menuju pekerjaan produktif dan layak.'); st.markdown('[Tujuan 8](https://sdgs.un.org/goals/goal8)')
+    st.subheader('Tim PenaklukFCMobile')
+    for col,name in zip(st.columns(3),['Christian Caesar','Gerald Amadeo Passover Sutanto','Nicholas Driyadis Tjoe']):
+        with col:
+            with st.container(border=True): st.write(name)
 elif page=='EDA':
-    heading(page,'Explore the data','Understand the dataset before interpreting recommendations.')
-    counts=d.career.value_counts(); a,c,e=st.columns(3);a.metric('Profiles',len(d));c.metric('Largest class',f'{counts.iloc[0]/len(d):.1%}');e.metric('Smallest class',f'{counts.iloc[-1]/len(d):.1%}')
-    t1,t2,t3=st.tabs(['Career distribution','Skill demand','Data sources'])
+    heading(page,'Exploratory Data Analysis','Jelajahi profil lokal, kandidat augmentasi, distribusi kelas, dan keterampilan.')
+    aug=result_profiles(); local=d.assign(dataset='Profil lokal'); extra=aug.assign(dataset='Augmentasi minoritas',split='Training candidate'); all_profiles=pd.concat([local,extra],ignore_index=True)
+    with st.container(border=True):
+        a,c=st.columns(2)
+        scope=a.selectbox('Dataset',['Profil lokal','Augmentasi minoritas','Gabungan kandidat'],key='eda_scope')
+        base={'Profil lokal':local,'Augmentasi minoritas':extra,'Gabungan kandidat':all_profiles}[scope]
+        source=c.selectbox('Sumber data',['Semua sumber']+sorted(base.source.unique()),key='eda_source_'+scope)
+        a,c=st.columns(2)
+        selected=base if source=='Semua sumber' else base[base.source.eq(source)]
+        field=a.selectbox('Keluarga karier',['Semua bidang']+sorted(selected.career.unique()),key='eda_field_'+scope+'_'+source)
+        subset=selected if field=='Semua bidang' else selected[selected.career.eq(field)]
+        top=c.slider('Jumlah skill teratas',5,30,15,key='eda_top')
+        st.caption('Kandidat augmentasi hanya digunakan dalam eksperimen training; model utama dan test set lokal tidak berubah.')
+    counts=subset.career.value_counts(); tokens=subset.skills.str.split('|').explode(); a,c,e=st.columns(3)
+    a.metric('Profil terpilih',f'{len(subset):,}');c.metric('Keluarga karier',subset.career.nunique());e.metric('Skill unik',tokens.nunique())
+    t1,t2,t3,t4=st.tabs(['Distribusi karier','Keterampilan','Perbandingan dataset','Sumber & data explorer'])
     with t1:
-        st.bar_chart(counts);table=counts.rename('Profiles').to_frame();table['Share']=table.Profiles/len(d);st.dataframe(table.style.format({'Share':'{:.1%}'}),use_container_width=True)
-        st.warning('Software Development dominates the retained sample. It is not an estimate of national job demand. Evaluate minority classes using macro F1, balanced accuracy and per-class recall.')
+        st.subheader('Distribusi keluarga karier'); st.bar_chart(counts,horizontal=True)
+        table=counts.rename('Profil').to_frame();table['Proporsi']=table.Profil/len(subset);st.dataframe(table.style.format({'Proporsi':'{:.1%}'}),use_container_width=True)
+        st.caption('Proporsi sampel yang diproses, bukan estimasi distribusi pekerjaan nasional.')
     with t2:
-        field=st.selectbox('Career field',['All fields']+sorted(d.career.unique()));subset=d if field=='All fields' else d[d.career==field];st.bar_chart(subset.skills.str.split('|').explode().value_counts().head(20))
+        st.subheader('Keterampilan paling sering muncul'); freq=tokens.value_counts().head(top).rename('Profil');st.bar_chart(freq,horizontal=True)
+        st.dataframe(freq.to_frame().assign(**{'Proporsi profil':freq/len(subset)}).style.format({'Proporsi profil':'{:.1%}'}),use_container_width=True)
+        st.download_button('Unduh frekuensi skill',freq.to_csv(),'skill_frequency.csv','text/csv')
     with t3:
-        st.bar_chart(d.source.value_counts());st.dataframe(d[['title','career','skills','source']].head(30),hide_index=True,use_container_width=True)
+        st.subheader('Profil lokal dan tambahan minoritas');comp=pd.crosstab(all_profiles.career,all_profiles.dataset).reindex(columns=['Profil lokal','Augmentasi minoritas'],fill_value=0)
+        st.bar_chart(comp,horizontal=True);st.dataframe(comp.assign(Total=comp.sum(axis=1)),use_container_width=True)
+        a,c=st.columns(2);a.metric('Profil lokal',f'{len(local):,}');c.metric('Kandidat tambahan',f'{len(extra):,}')
+        st.subheader('Distribusi training per metode')
+        bd=result('balance_training_distribution');method=st.selectbox('Metode balancing',bd.method.unique(),key='eda_method');st.bar_chart(bd[bd.method.eq(method)].set_index('career').training_rows,horizontal=True)
+        st.caption('Distribusi training setelah resampling dapat mencakup profil berulang.')
+    with t4:
+        st.subheader('Sumber profil terpilih');st.bar_chart(subset.source.value_counts(),horizontal=True)
+        audit_tab,aug_tab=st.tabs(['Audit sumber utama','Audit augmentasi'])
+        with audit_tab: st.dataframe(result('data_audit'),hide_index=True,use_container_width=True)
+        with aug_tab: st.dataframe(result('balance_data_audit'),hide_index=True,use_container_width=True)
+        q=st.text_input('Cari judul pekerjaan atau keterampilan',key='eda_search');show=subset[['title','career','skills','source','dataset','split']];show=show[show.title.str.contains(q,case=False,regex=False,na=False)|show.skills.str.contains(q,case=False,regex=False,na=False)] if q else show
+        st.caption(f'{len(show):,} profil ditemukan');st.dataframe(show,hide_index=True,use_container_width=True,height=360)
+        st.download_button('Unduh profil terpilih',show.to_csv(index=False),'selected_profiles.csv','text/csv')
 elif page=='Preprocessing':
     heading(page,'From job text to skills','A reproducible pipeline with grouped evaluation.')
     for i,(title,desc) in enumerate([('Filter digital-sector jobs','Retain relevant records and audit source quality.'),('Assign career labels','Infer weak labels from titles, not from model inputs.'),('Extract skills','Normalize bilingual skill names and aliases.'),('Deduplicate and split','Group identical skill profiles across splits.'),('Build model features','Fit TF-IDF inside each training fold.')],1):
         with st.container(border=True): st.markdown(f'**{i:02d} · {title}**');st.caption(desc)
     st.subheader('Development and test distribution');st.dataframe(pd.crosstab(d.career,d.split),use_container_width=True)
-    with st.expander('Source audit and limitations'):
-        st.dataframe(result('data_audit'),hide_index=True);st.write('Near-duplicates and temporal overlap can remain. International augmentation is an experiment, not a source of Indonesian demand weights. Labels require independent human review.')
+    with st.expander('Source quality audit'):
+        st.dataframe(result('data_audit'),hide_index=True);st.caption('Labels are derived from job titles; international profiles are used only in augmentation experiments.')
 elif page=='Training & Testing':
     heading(page,'Model evaluation','Pretrained models; default selected using four-fold grouped development CV.')
     model=st.selectbox('Select algorithm',opts,index=opts.index(best),key='evaluation_model');row=m[(m.model==model)&(m.split=='test')].iloc[0]
@@ -108,16 +162,16 @@ elif page=='Training & Testing':
         ge=result('gap_evaluation');v3=result('gap_v3_evaluation');a,c,e=st.columns(3);a.metric('Hit@5',f'{v3.hit5.mean():.1%}');c.metric('Hit@10',f'{v3.hit10.mean():.1%}');e.metric('Global baseline Hit@5',f'{ge.global_hit.mean():.1%}');st.caption('One observed skill hidden. Retrospective evaluation, not hiring or learning success.')
     with t4:
         st.subheader('Balancing experiments')
-        st.caption('Ten scenarios evaluated on the same local split. Original test has been used previously; results are retrospective. Only training folds are resampled. Local demand profiles remain unchanged.')
+        st.caption('Ten scenarios on the same retrospective local holdout. Resampling is applied only to training folds.')
         bm=result('balance_metrics');bs=json.loads((ROOT/'results/balance_summary.json').read_text());st.info('CV winner: '+bs['selected']+' | Balanced alternative: '+bs['alternative'])
-        chosen_split=st.radio('Evaluation split',['grouped CV','test'],horizontal=True,key='balance_split');view=bm[bm.split.eq(chosen_split)].set_index('method');st.bar_chart(view[['macro_f1','balanced_accuracy']]);st.dataframe(view.drop(columns='split').style.format('{:.2%}'),use_container_width=True)
+        chosen_split=st.selectbox('Evaluation split',['grouped CV','test'],key='balance_split');view=bm[bm.split.eq(chosen_split)].set_index('method');st.bar_chart(view[['macro_f1','balanced_accuracy']]);st.dataframe(view.drop(columns='split').style.format('{:.2%}'),use_container_width=True)
         st.subheader('Minority augmentation');st.dataframe(result('balance_data_audit'),hide_index=True);st.write(bs['augmentation_counts'])
         selected_method=st.selectbox('Training distribution',bm.method.unique(),key='balance_method');dist=result('balance_training_distribution');st.bar_chart(dist[dist.method.eq(selected_method)].set_index('career').training_rows);st.caption('Counts reflect resampling, not unique profiles or national demand.')
         st.code('python -m src.balance',language='bash')
     with st.expander('Advanced evaluation and reproducibility'):
         st.code('python -m src.train',language='bash')
         for f in ['tuning','robustness','bootstrap_ci','gap_tuning','gap_v3_tuning','similarity_audit','label_audit','specialization_support','source_holdout']:
-            st.markdown('**'+f.replace('_',' ').title()+'**');st.dataframe(result(f),hide_index=True)
+            st.markdown('**'+{'gap_v3_tuning':'Neighborhood ranking tuning'}.get(f,f.replace('_',' ').title())+'**');st.dataframe(result(f),hide_index=True)
     st.button('Try the model in Prediction',on_click=go,args=('Prediction',),type='primary')
 else:
     heading(page,'Find your career direction','Select your skills, explore a career, and build a learning plan.')
@@ -131,7 +185,7 @@ else:
         known=sorted(set(known+extract(text))&set(b['vocabulary']))
     ranked=recommend(b,known,model)
     if ranked.empty: st.info('Choose a quick-start profile or select at least one recognized skill.');st.stop()
-    if len(known)<3: st.warning('Few skills: results are tentative.')
+    if len(known)<3: st.caption('Tambahkan lebih banyak keterampilan untuk memperkaya profil.')
     st.subheader('2. Your recommended career fields')
     for col,row in zip(st.columns(3),ranked.head(3).itertuples(index=False,name=None)):
         with col:
